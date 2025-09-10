@@ -1,5 +1,5 @@
 import MyButton from './btn';
-
+import Image from 'next/image'
 
 export default function Lab1() {
     return (
@@ -49,7 +49,7 @@ heading and h6 is the smallest heading.
         <ul id="wd-my-books">
             <li>Dune</li>
             <li>Lord of the Rings</li>
-            <li>Ender's Game</li>
+            <li>Ender&apos;s Game</li>
             <li>Red Mars</li>
             <li>The Forever War</li>
         </ul>
@@ -147,11 +147,11 @@ heading and h6 is the smallest heading.
         <div id="wd-images">
             <h4>Image tag</h4>
             Loading an image from the internet: <br />
-            <img id="wd-starship" width="400px"   src="https://www.staradvertiser.com/wp-content/uploads/2021/08/web1_Starship-gap2.jpg" />
+            <Image id="wd-starship" alt="image tag" width={400} height={200}  src="https://www.staradvertiser.com/wp-content/uploads/2021/08/web1_Starship-gap2.jpg" />
             <br />
             Loading a local image:
             <br />
-            <img id="wd-teslabot" src="/images/teslabot.jpg" height="200px" />
+            <Image id="wd-teslabot" alt="local image" src="/images/teslabot.jpg" width={400} height={200} />
         </div>
         <div id="wd-forms">
             <h4>Form Elements</h4>
@@ -160,13 +160,13 @@ heading and h6 is the smallest heading.
                 <label htmlFor="wd-text-fields-username">Username:</label>
                 <input placeholder="jdoe" id="wd-text-fields-username" /> <br />
                 <label htmlFor="wd-text-fields-password">Password:</label>
-                <input type="password" value="123@#$asd" id="wd-text-fields-password" />
+                <input type="password" defaultValue="123@#$asd" id="wd-text-fields-password" />
                 <br />
                 <label htmlFor="wd-text-fields-first-name">First name:</label>
                 <input type="text" title="John" id="wd-text-fields-first-name" /> <br />
                 <label htmlFor="wd-text-fields-last-name">Last name:</label>
                 <input type="text" placeholder="Doe"
-                    value="Wonderland"
+                    defaultValue="Wonderland"
                     title="The last name"
                     id="wd-text-fields-last-name" />
                 {/* copy rest of form elements here  */}
@@ -244,20 +244,20 @@ heading and h6 is the smallest heading.
 
 <label htmlFor="wd-text-fields-salary-start"> Starting salary:</label>
 <input type="number"
-       value="100000"
+       defaultValue="100000"
        placeholder="1000"
        id="wd-text-fields-salary-start"/><br/>
 
 <label htmlFor="wd-text-fields-rating"> Rating: </label>
 <input type="range"
-       value="4"
+       defaultValue="4"
        max="5"
        placeholder="Doe"
        id="wd-text-fields-rating"/><br/>
 
 <label htmlFor="wd-text-fields-dob"> Date of birth: </label>
 <input type="date"
-       value="2000-01-21"
+       defaultValue="2000-01-21"
        id="wd-text-fields-dob"/><br/>
 <h4>Anchor tag</h4>
 Please
