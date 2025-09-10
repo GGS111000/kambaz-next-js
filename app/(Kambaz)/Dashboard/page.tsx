@@ -8,7 +8,7 @@ export default function Dashboard() {
       <div id="wd-dashboard-courses">
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/reactjs.jpg" width={200} height={150} />
+            <Image src="/images/reactjs.jpg" alt="react-logo" width={200} height={150} />
             <div>
               <h5> CS1234 React JS </h5>
               <p className="wd-dashboard-course-title">
@@ -21,7 +21,7 @@ export default function Dashboard() {
         
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/course1.jpg" width={200} height={150} />
+            <Image src="/images/course1.jpg" alt="photo-course-1" width={200} height={150} />
             <div>
               <h5> CS5700 Fundamentals </h5>
               <p className="wd-dashboard-course-title">
@@ -34,7 +34,7 @@ export default function Dashboard() {
 
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/course2.jpg" width={200} height={150} />
+            <Image src="/images/course2.jpg" alt="photo-course-2" width={200} height={150} />
             <div>
               <h5> AI in Action </h5>
               <p className="wd-dashboard-course-title">
@@ -47,7 +47,7 @@ export default function Dashboard() {
 
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/course3.jpg" width={200} height={150} />
+            <Image src="/images/course3.jpg" alt="photo-course-3" width={200} height={150} />
             <div>
               <h5> Career Design Course </h5>
               <p className="wd-dashboard-course-title">
@@ -60,7 +60,7 @@ export default function Dashboard() {
 
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/course4.jpg" width={200} height={150} />
+            <Image src="/images/course4.jpg" alt="photo-course-4" width={200} height={150} />
             <div>
               <h5> CS5002 Discrete Structures </h5>
               <p className="wd-dashboard-course-title">
@@ -73,7 +73,7 @@ export default function Dashboard() {
 
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/course5.jpg" width={200} height={150} />
+            <Image src="/images/course5.jpg" alt="photo-course-5" width={200} height={150} />
             <div>
               <h5> CS5004 OOD </h5>
               <p className="wd-dashboard-course-title">
@@ -86,7 +86,7 @@ export default function Dashboard() {
 
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/course6.jpg" width={200} height={150} />
+            <Image src="/images/course6.jpg" alt="photo-course-6" width={200} height={150} />
             <div>
               <h5> CS5008 Data Str </h5>
               <p className="wd-dashboard-course-title">
@@ -99,7 +99,7 @@ export default function Dashboard() {
 
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/course7.jpg" width={200} height={150} />
+            <Image src="/images/course7.jpg" alt="photo-course-7" width={200} height={150} />
             <div>
               <h5> CS5800 Algorithms Summer </h5>
               <p className="wd-dashboard-course-title">
@@ -112,7 +112,7 @@ export default function Dashboard() {
 
         <div className="wd-dashboard-course">
           <Link href="/Courses/1234" className="wd-dashboard-course-link">
-            <Image src="/images/course8.jpg" width={200} height={150} />
+            <Image src="/images/course8.jpg" alt="photo-course-8" width={200} height={150} />
             <div>
               <h5> CS5009 Recitation </h5>
               <p className="wd-dashboard-course-title">
