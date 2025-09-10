@@ -1,9 +1,12 @@
 import MyButton from './btn';
 import Image from 'next/image'
+import Link from "next/link";
 
 export default function Lab1() {
     return (
       <div id="wd-lab1">
+        <h1>Xiaojie Cui, Fall 2025, CS5610</h1>
+        <Link href="https://kambaz-next-js-swart.vercel.app/"> My vecel link </Link>
         <h2>Lab 1</h2>
         <h3>HTML Examples</h3>
         <div id="wd-h-tag">
