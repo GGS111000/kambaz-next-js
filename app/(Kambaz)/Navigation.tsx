@@ -28,7 +28,7 @@ export default function KambazNavigation() {
      </ListGroupItem>
      {/* complete styling the rest of the links */}
      <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/Courses" id="wd-courses-link" className="text-danger text-decoration-none">
+       <Link href="/Courses/1" id="wd-courses-link" className="text-danger text-decoration-none">
          <AiOutlineDashboard className="fs-1 text-white" />
          <br />
          Courses
