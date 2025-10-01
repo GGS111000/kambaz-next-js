@@ -1,6 +1,11 @@
-import { redirect } from "next/dist/client/components/navigation";
 
+import { redirect } from "next/navigation";
+import React from "react";
 
 export default function AccountPage() {
- redirect("/Account/Signin");
+ 
+  redirect("/Account/Signin");
+
+ 
+  return <div>Redirecting to Signin...</div>;
 }

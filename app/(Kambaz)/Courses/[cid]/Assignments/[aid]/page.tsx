@@ -1,100 +1,111 @@
+"use client";
+
+import { Form, Button } from "react-bootstrap";
+import { useParams } from "next/navigation";
+
 export default function AssignmentEditor() {
+  const { aid } = useParams(); 
+
+
   return (
-    <div id="wd-assignments-editor">
-      <label htmlFor="wd-name">Assignment Name</label>
-      <input id="wd-name" defaultValue="A1 - ENV + HTML" /><br /><br />
-      <textarea id="wd-description">
-        The assignment is available online Submit a link to the landing page of
-      </textarea>
-      <br />
-      <table>
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-points">Points</label>
-          </td>
-          <td>
-            <input id="wd-points" defaultValue={100} />
-          </td>
-        </tr>
-        {/* Complete on your own */}
+    <div className="container mt-4" id="wd-assignments-editor">
+      <h3 className="fw-bold mb-3">Edit Assignment</h3>
+      <hr />
 
-<tr>
-  <td align="right" valign="top">
-    <label htmlFor="wd-group">Assignment Group</label>
-  </td>
-  <td>
-    <select id="wd-group">
-      <option>ASSIGNMENTS</option>
-      <option>EXAMS</option>
-    </select>
-  </td>
-</tr>
+      <Form>
+        {/* Assignment Name */}
+        <Form.Group className="mb-3" controlId="wd-name">
+          <Form.Label className="fw-semibold">Assignment Name</Form.Label>
+          <Form.Control type="text" defaultValue={`${aid}`} />
+        </Form.Group>
 
-<tr>
-  <td align="right" valign="top">
-    <label htmlFor="wd-display-grade-as">Display Grade as</label>
-  </td>
-  <td>
-    <select id="wd-display-grade-as">
-      <option>Percentage</option>
-      <option>Points</option>
-      <option>Letter</option>
-    </select>
-  </td>
-</tr>
+        {/* Description */}
+        <Form.Group className="mb-3" controlId="wd-description">
+          <Form.Label className="fw-semibold">Description</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={4}
+            defaultValue="The assignment is available online. Submit a link to the landing page of your work."
+          />
+        </Form.Group>
 
-<tr>
-  <td align="right" valign="top">
-    <label htmlFor="wd-submission-type">Submission Type</label>
-  </td>
-  <td>
-    <select id="wd-submission-type">
-      <option>Online</option>
-      <option>On Paper</option>
-    </select>
-  </td>
-</tr>
+        {/* Points */}
+        <Form.Group className="mb-3" controlId="wd-points">
+          <Form.Label className="fw-semibold">Points</Form.Label>
+          <Form.Control type="number" defaultValue={100} />
+        </Form.Group>
 
-<tr>
-  <td align="right" valign="top">Online Entry Options</td>
-  <td>
-    <input type="checkbox" id="wd-text-entry" /> <label htmlFor="wd-text-entry">Text Entry</label><br/>
-    <input type="checkbox" id="wd-website-url" /> <label htmlFor="wd-website-url">Website URL</label><br/>
-    <input type="checkbox" id="wd-media-recordings" /> <label htmlFor="wd-media-recordings">Media Recordings</label><br/>
-    <input type="checkbox" id="wd-student-annotation" /> <label htmlFor="wd-student-annotation">Student Annotation</label><br/>
-    <input type="checkbox" id="wd-file-upload" /> <label htmlFor="wd-file-upload">File Uploads</label>
-  </td>
-</tr>
+        {/* Assignment Group */}
+        <Form.Group className="mb-3" controlId="wd-group">
+          <Form.Label className="fw-semibold">Assignment Group</Form.Label>
+          <Form.Select>
+            <option>ASSIGNMENTS</option>
+            <option>EXAMS</option>
+          </Form.Select>
+        </Form.Group>
 
-<tr>
-  <td align="right" valign="top">
-    <label htmlFor="wd-assign-to">Assign to</label>
-  </td>
-  <td>
-    <input id="wd-assign-to" defaultValue="Everyone" />
-  </td>
-</tr>
+        {/* Display Grade As */}
+        <Form.Group className="mb-3" controlId="wd-display-grade-as">
+          <Form.Label className="fw-semibold">Display Grade as</Form.Label>
+          <Form.Select>
+            <option>Percentage</option>
+            <option>Points</option>
+            <option>Letter</option>
+          </Form.Select>
+        </Form.Group>
 
-<tr>
-  <td align="right" valign="top">
-    <label htmlFor="wd-due-date">Due</label>
-  </td>
-  <td>
-    <input id="wd-due-date" type="date" />
-  </td>
-</tr>
+        {/* Submission Type */}
+        <Form.Group className="mb-3" controlId="wd-submission-type">
+          <Form.Label className="fw-semibold">Submission Type</Form.Label>
+          <Form.Select>
+            <option>Online</option>
+            <option>On Paper</option>
+          </Form.Select>
+        </Form.Group>
 
-<tr>
-  <td align="right" valign="top">
-    <label htmlFor="wd-available-from">Available from</label>
-  </td>
-  <td>
-    <input id="wd-available-from" type="date" /> Until <input id="wd-available-until" type="date" />
-  </td>
-</tr>
+        {/* Online Entry Options */}
+        <Form.Group className="mb-3">
+          <Form.Label className="fw-semibold">Online Entry Options</Form.Label>
+          <div>
+            <Form.Check type="checkbox" id="wd-text-entry" label="Text Entry" />
+            <Form.Check type="checkbox" id="wd-website-url" label="Website URL" />
+            <Form.Check type="checkbox" id="wd-media-recordings" label="Media Recordings" />
+            <Form.Check type="checkbox" id="wd-student-annotation" label="Student Annotation" />
+            <Form.Check type="checkbox" id="wd-file-upload" label="File Uploads" />
+          </div>
+        </Form.Group>
 
+        {/* Assign To */}
+        <Form.Group className="mb-3" controlId="wd-assign-to">
+          <Form.Label className="fw-semibold">Assign to</Form.Label>
+          <Form.Control type="text" defaultValue="Everyone" />
+        </Form.Group>
 
+        {/* Due Date */}
+        <Form.Group className="mb-3" controlId="wd-due-date">
+          <Form.Label className="fw-semibold">Due</Form.Label>
+          <Form.Control type="date" />
+        </Form.Group>
 
-      </table>
+        {/* Available From & Until */}
+        <Form.Group className="mb-3" controlId="wd-available-from">
+          <Form.Label className="fw-semibold">Available from</Form.Label>
+          <div className="d-flex gap-2">
+            <Form.Control type="date" />
+            <span className="align-self-center">Until</span>
+            <Form.Control type="date" />
+          </div>
+        </Form.Group>
+
+        <div className="mt-4">
+          <Button variant="danger" type="submit">
+            Save
+          </Button>{" "}
+          <Button variant="secondary" type="button">
+            Cancel
+          </Button>
+        </div>
+      </Form>
     </div>
-);}
+  );
+}
