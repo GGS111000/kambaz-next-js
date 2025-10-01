@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Labs from "./Labs";   // TOC
-import Lab1 from "./Labs/Lab1";
-import Lab2 from "./Labs/Lab2";
-import Lab3 from "./Labs/Lab3";
+// import Labs from "./Labs";   // TOC
+// import Lab1 from "./Labs/Lab1";
+// import Lab2 from "./Labs/Lab2";
+// import Lab3 from "./Labs/Lab3";
 
 const root = ReactDOM.createRoot(document.getElementById("root")!);
 root.render(
