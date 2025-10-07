@@ -1,58 +1,3 @@
-// import { Table } from "react-bootstrap";
-// import { FaUserCircle } from "react-icons/fa";
-// export default function PeopleTable() {
-//  return (
-//   <div id="wd-people-table">
-//    <Table striped>
-//     <thead>
-//      <tr><th>Name</th><th>Login ID</th><th>Section</th><th>Role</th><th>Last Activity</th><th>Total Activity</th></tr>
-//     </thead>
-//     <tbody>
-//      <tr><td className="wd-full-name text-nowrap">
-//           <FaUserCircle className="me-2 fs-1 text-secondary" />
-//           <span className="wd-first-name">Tony</span>{" "}
-//           <span className="wd-last-name">Stark</span></td>
-//       <td className="wd-login-id">001234561S</td>
-//       <td className="wd-section">S101</td>
-//       <td className="wd-role">STUDENT</td>
-//       <td className="wd-last-activity">2020-10-01</td>
-//       <td className="wd-total-activity">10:21:32</td></tr>
-//           {/* Add at least 3 more users such as Bruce Wayne, Steve Rogers, and Natasha Romanoff */}
-//         <tr><td className="wd-full-name text-nowrap">
-//           <FaUserCircle className="me-2 fs-1 text-secondary" />
-//           <span className="wd-first-name">Steve </span>{" "}
-//           <span className="wd-last-name"> Rogers </span></td>
-//       <td className="wd-login-id">001234562S</td>
-//       <td className="wd-section">S101</td>
-//       <td className="wd-role">STUDENT</td>
-//       <td className="wd-last-activity">2020-10-01</td>
-//       <td className="wd-total-activity">10:21:32</td></tr>
-
-//       <tr><td className="wd-full-name text-nowrap">
-//           <FaUserCircle className="me-2 fs-1 text-secondary" />
-//           <span className="wd-first-name">Natasha </span>{" "}
-//           <span className="wd-last-name"> Romanof</span></td>
-//       <td className="wd-login-id">001234563S</td>
-//       <td className="wd-section">S101</td>
-//       <td className="wd-role">STUDENT</td>
-//       <td className="wd-last-activity">2020-10-01</td>
-//       <td className="wd-total-activity">10:21:32</td></tr>
-
-//       <tr><td className="wd-full-name text-nowrap">
-//           <FaUserCircle className="me-2 fs-1 text-secondary" />
-//           <span className="wd-first-name">Bruce </span>{" "}
-//           <span className="wd-last-name"> Wayne</span></td>
-//       <td className="wd-login-id">001234564S</td>
-//       <td className="wd-section">S101</td>
-//       <td className="wd-role">STUDENT</td>
-//       <td className="wd-last-activity">2020-10-01</td>
-//       <td className="wd-total-activity">10:21:32</td></tr>
-    
-    
-//     </tbody>
-//    </Table>
-//   </div> );}
-
 "use client";
 
 import React from "react";
@@ -60,22 +5,40 @@ import { useParams } from "next/navigation";
 import * as db from "../../../../Database";
 import { FaUserCircle } from "react-icons/fa";
 
+interface User {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  loginId: string;
+  section: string;
+  role: string;
+  lastActivity: string;
+  totalActivity: string;
+}
+
+interface Enrollment {
+  _id: string;
+  user: string;
+  course: string;
+}
+
 export default function PeopleTable() {
   const { cid } = useParams<{ cid: string }>();
-  const { users, enrollments } = db;
+  const { users, enrollments } = db as {
+    users: User[];
+    enrollments: Enrollment[];
+  };
 
-  // ✅ 筛选当前课程注册的用户
-  const enrolledUsers = users.filter((usr: any) =>
+  const enrolledUsers = users.filter((usr: User) =>
     enrollments.some(
-      (enr: any) => enr.user === usr._id && enr.course === cid
+      (enr: Enrollment) => enr.user === usr._id && enr.course === cid
     )
   );
 
   return (
     <div className="container mt-4">
-      <h3 className="fw-bold text-danger mb-3">People</h3>
+      <h3 className="fw-bold text-danger mb-3">People in {cid}</h3>
       <hr />
-
       <table className="table table-striped align-middle">
         <thead className="table-light">
           <tr>
@@ -88,7 +51,7 @@ export default function PeopleTable() {
           </tr>
         </thead>
         <tbody>
-          {enrolledUsers.map((user: any) => (
+          {enrolledUsers.map((user: User) => (
             <tr key={user._id}>
               <td>
                 <FaUserCircle className="me-2 fs-3 text-secondary" />
