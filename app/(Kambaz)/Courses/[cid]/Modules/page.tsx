@@ -1,86 +1,82 @@
+"use client";
+import { useParams } from "next/navigation";
+import * as db from "../../../Database";
+
+
 import { ListGroup, ListGroupItem } from "react-bootstrap";
-import ModulesControls from "./ModulesControls";
 import { BsGripVertical } from "react-icons/bs";
-import LessonControlButtons from "./LessonControlButtons";
+import ModulesControls from "./ModulesControls";
 import ModuleControlButtons from "./ModuleControlButtons";
+import LessonControlButtons from "./LessonControlButtons";
+
 export default function Modules() {
+  const { cid } = useParams<{ cid: string }>();
+  const modules = db.modules;
+
+  if (!cid) return null; 
+
+
+  const courseModules = modules.filter((m: any) => m.course === cid);
+
   return (
-    <div>
-    <div>
-      {/* Implement Collapse All button, View Progress button, etc. */}
-      {/* <ul id="wd-modules">
-        <li className="wd-module">
-          <div className="wd-title">Week 1</div>
-          <ul className="wd-lessons">
-            <li className="wd-lesson">
-              <span className="wd-title">LEARNING OBJECTIVES</span>
-              <ul className="wd-content">
-                <li className="wd-content-item">Introduction to the course</li>
-                <li className="wd-content-item">Learn what is Web Development</li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li className="wd-module">
-          <div className="wd-title">Week 2</div>
-        </li>
-        <li className="wd-module">
-          <div className="wd-title">Week 3</div>
-        </li>
-      </ul> */}
-      <ModulesControls /><br /><br /><br /><br />
-  <ListGroup className="rounded-0" id="wd-modules">
-    <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-      <div className="wd-title p-3 ps-2 bg-secondary">
-        <BsGripVertical className="me-2 fs-3" /> Week 1 <ModuleControlButtons />
-        </div>
-      <ListGroup className="wd-lessons rounded-0">
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          <BsGripVertical className="me-2 fs-3" />
-          LEARNING OBJECTIVES <LessonControlButtons /></ListGroupItem>
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          <BsGripVertical className="me-2 fs-3" /> 
-          Introduction to the course <LessonControlButtons />
-          </ListGroupItem>
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          Learn what is Web Development </ListGroupItem>
+    <div className="p-3">
+
+      <ModulesControls />
+      <br />
+      <br />
+      <br />
+      <br />
+
+     
+      <ListGroup className="rounded-0" id="wd-modules">
+        {courseModules.length === 0 ? (
+          <p className="text-muted ps-2">
+            No modules found for this course.
+          </p>
+        ) : (
+          courseModules.map((module: any) => (
+            <ListGroupItem
+              key={module._id}
+              className="wd-module p-0 mb-5 fs-5 border-gray"
+            >
+         
+              <div className="wd-title p-3 ps-2 bg-secondary text-white">
+                <BsGripVertical className="me-2 fs-3" />
+                {module.name}
+                <ModuleControlButtons />
+              </div>
+
+      
+              {module.description && (
+                <div className="ps-4 py-2 text-muted small border-bottom">
+                  {module.description}
+                </div>
+              )}
+
+         
+              {module.lessons && (
+                <ListGroup className="wd-lessons rounded-0">
+                  {module.lessons.map((lesson: any) => (
+                    <ListGroupItem
+                      key={lesson._id}
+                      className="wd-lesson p-3 ps-4"
+                    >
+                      <BsGripVertical className="me-2 fs-3 text-secondary" />
+                      {lesson.name}
+                      <LessonControlButtons />
+                      {lesson.description && (
+                        <div className="text-muted small ps-4">
+                          {lesson.description}
+                        </div>
+                      )}
+                    </ListGroupItem>
+                  ))}
+                </ListGroup>
+              )}
+            </ListGroupItem>
+          ))
+        )}
       </ListGroup>
-    </ListGroupItem>
-    <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-      <div className="wd-title p-3 ps-2 bg-secondary"> Week 2 </div>
-      <ListGroup className="wd-lessons rounded-0">
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          LESSON 1 </ListGroupItem>
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          LESSON 2 </ListGroupItem>
-      </ListGroup>
-    </ListGroupItem>
-  </ListGroup>
     </div>
-    <div>
-  <ModulesControls /><br /><br /><br /><br />
-  <ListGroup className="rounded-0" id="wd-modules">
-    <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-      <div className="wd-title p-3 ps-2 bg-secondary"> Week 1 </div>
-      <ListGroup className="wd-lessons rounded-0">
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          LEARNING OBJECTIVES </ListGroupItem>
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          Introduction to the course </ListGroupItem>
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          Learn what is Web Development </ListGroupItem>
-      </ListGroup>
-    </ListGroupItem>
-    <ListGroupItem className="wd-module p-0 mb-5 fs-5 border-gray">
-      <div className="wd-title p-3 ps-2 bg-secondary"> Week 2 </div>
-      <ListGroup className="wd-lessons rounded-0">
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          LESSON 1 </ListGroupItem>
-        <ListGroupItem className="wd-lesson p-3 ps-1">
-          LESSON 2 </ListGroupItem>
-      </ListGroup>
-    </ListGroupItem>
-  </ListGroup>
-</div>
-</div>
-);}
+  );
+}
