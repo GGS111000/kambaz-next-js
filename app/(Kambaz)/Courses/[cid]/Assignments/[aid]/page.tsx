@@ -8,11 +8,10 @@ import * as db from "../../../../Database";
 export default function AssignmentEditor() {
   const { cid, aid } = useParams<{ cid: string; aid: string }>();
 
-  // ✅ 从数据库读取
   const assignments = db.assignments || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const assignment = assignments.find((a: any) => a._id === aid);
 
-  // ✅ 模拟一些扩展数据（如果 JSON 中没有）
   const description =
     "The assignment is available online. Submit a link to the landing page of your Web application running on Netlify.\n\nThe landing page should include the following:\n\n• Your full name and section\n• Links to each of the lab assignments\n• Link to the Kambaz application\n• Links to all relevant source code repositories\n\nThe Kambaz application should include a link to navigate back to the landing page.";
 

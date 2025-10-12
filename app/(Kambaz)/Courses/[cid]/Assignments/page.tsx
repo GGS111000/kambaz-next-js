@@ -12,7 +12,7 @@ export default function Assignments() {
   const { cid } = useParams<{ cid: string }>();
   const assignments = db.assignments || [];
 
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const courseAssignments = assignments.filter((a: any) => a.course === cid);
 
   return (
@@ -51,7 +51,7 @@ export default function Assignments() {
           </div>
         </Card.Header>
 
-    
+{/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
         {courseAssignments.map((a: any) => (
           <div
             key={a._id}
