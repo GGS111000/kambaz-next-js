@@ -1,6 +1,6 @@
 "use client";
 
-import { Form, Button } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import * as db from "../../../../Database";
@@ -24,13 +24,13 @@ export default function AssignmentEditor() {
       <hr />
 
       <Form>
-        {/* Assignment Name */}
+
         <Form.Group className="mb-3" controlId="wd-name">
           <Form.Label className="fw-semibold">Assignment Name</Form.Label>
           <Form.Control type="text" defaultValue={assignment?.title || aid} />
         </Form.Group>
 
-        {/* Description */}
+ 
         <Form.Group className="mb-3" controlId="wd-description">
           <Form.Label className="fw-semibold">Description</Form.Label>
           <Form.Control
@@ -41,17 +41,17 @@ export default function AssignmentEditor() {
           />
         </Form.Group>
 
-        {/* Points */}
+  
         <Form.Group className="mb-3" controlId="wd-points">
           <Form.Label className="fw-semibold">Points</Form.Label>
           <Form.Control type="number" defaultValue={100} />
         </Form.Group>
 
-        {/* Assign Section */}
+
         <Form.Group className="mb-3 border rounded p-3">
           <Form.Label className="fw-semibold mb-2">Assign</Form.Label>
 
-          {/* Assign To */}
+
           <Form.Group className="mb-3" controlId="wd-assign-to">
             <Form.Label className="fw-semibold small">Assign to</Form.Label>
             <Form.Control type="text" defaultValue="Everyone" />
@@ -63,7 +63,7 @@ export default function AssignmentEditor() {
             <Form.Control type="datetime-local" defaultValue={dueDate} />
           </Form.Group>
 
-          {/* Available Dates */}
+     
           <Form.Group className="mb-3" controlId="wd-available-from">
             <Form.Label className="fw-semibold small">Available from</Form.Label>
             <div className="d-flex gap-2">
@@ -74,7 +74,7 @@ export default function AssignmentEditor() {
           </Form.Group>
         </Form.Group>
 
-        {/* Save & Cancel */}
+    
         <div className="mt-4 text-end">
           <Link href={`/Courses/${cid}/Assignments`} className="btn btn-secondary me-2">
             Cancel
