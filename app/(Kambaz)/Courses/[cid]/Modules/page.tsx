@@ -15,7 +15,7 @@ export default function Modules() {
 
   if (!cid) return null; 
 
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
   const courseModules = modules.filter((m: any) => m.course === cid);
 
   return (
@@ -34,6 +34,7 @@ export default function Modules() {
             No modules found for this course.
           </p>
         ) : (
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           courseModules.map((module: any) => (
             <ListGroupItem
               key={module._id}
@@ -56,6 +57,7 @@ export default function Modules() {
          
               {module.lessons && (
                 <ListGroup className="wd-lessons rounded-0">
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
                   {module.lessons.map((lesson: any) => (
                     <ListGroupItem
                       key={lesson._id}
