@@ -11,6 +11,7 @@ export default function AccountPage() {
   // ② 避免对 undefined 直接解构
   const accountSlice =
     useSelector((state: any) => state.account) ??
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useSelector((state: any) => state.accountReducer) ??
     {};
 

@@ -21,7 +21,10 @@ const enrollmentSlice = createSlice({
           (enr) => !(enr.user === userId && enr.course === courseId)
         );
       } else {
-        state.enrollments.push({ user: userId, course: courseId });
+        state.enrollments.push({
+          user: userId, course: courseId,
+          _id: ""
+        });
       }
     },
   },
