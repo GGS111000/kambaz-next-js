@@ -1,3 +1,4 @@
+
 import { ReactNode } from "react";
 import CourseNavigation from "./Navigation";
 import KambazNavigation from "../../Navigation";

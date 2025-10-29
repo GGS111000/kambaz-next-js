@@ -2,14 +2,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import Link from "next/link";
-//import * as db from "../Database";
-import * as db from "../Database/index"; // ✅ 显式只引入纯数据文件
+
+import * as db from "../Database/index"; 
 
 import Image from "next/image";
 import { Row, Col, Card, CardImg, CardBody, CardTitle, CardText, Button, FormControl } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
-//import { addNewCourse, deleteCourse, updateCourse } from "../Courses/[cid]/reducer";
+
 import { addNewCourse, deleteCourse, updateCourse } from "../Courses/redux-client";
 
 
