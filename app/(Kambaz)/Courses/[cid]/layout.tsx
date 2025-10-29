@@ -1,29 +1,5 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// // app/(Kambaz)/Courses/[cid]/layout.tsx
-// "use client";
-// import { ReactNode } from "react";
-// import CourseNavigation from "./Navigation";
-// import { useSelector } from "react-redux";
-// import { useParams } from "next/navigation";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-// export default function CoursesLayout({ children }: { children: ReactNode }) {
-//   const { cid } = useParams();
-//   const { courses } = useSelector((state: any) => state.coursesReducer);
-//   const course = courses.find((course: any) => course._id === cid);
-
-//   return (
-//     <div style={{ marginLeft: 120 }}> {/* ← 就加这一行 marginLeft */}
-//       <h2>
-//         {course?.name}
-//       </h2>
-//       <hr />
-//       <div className="d-flex">
-//         <div><CourseNavigation params={{ cid: cid as string }} /></div>
-//         <div className="flex-fill">{children}</div>
-//       </div>
-//     </div>
-//   );
-// }
 'use client';
 
 import { ReactNode, useState } from 'react';
@@ -37,7 +13,7 @@ export default function CoursesLayout({ children }: { children: ReactNode }) {
   const { courses } = useSelector((state: any) => state.coursesReducer);
   const course = courses.find((c: any) => c._id === cid);
 
-  const [showNav, setShowNav] = useState(true); // 控制是否显示子导航
+  const [showNav, setShowNav] = useState(true); 
 
   return (
     <div id="wd-courses" className="position-relative">

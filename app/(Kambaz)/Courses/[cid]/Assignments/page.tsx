@@ -68,6 +68,13 @@ export default function Assignments() {
               <p className="mb-0 text-muted small">
                 Multiple Modules | Due: TBD | 100 pts
               </p>
+
+<Link href={`/Courses/${cid}/Assignments/AssignmentEditor`}>
+  <Button variant="danger">+ Assignment</Button>
+</Link>
+
+
+
             </div>
             <div className="d-flex align-items-center">
               <GreenCheckmark />

@@ -1,5 +1,6 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as db from "../Database";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -12,8 +13,20 @@ import { v4 as uuidv4 } from "uuid";
 
 import { addNewCourse, deleteCourse, updateCourse } from "../Courses/redux-client";
 
+import { enroll, unenroll } from "./EnrollmentReducer";
+
 
 export default function Dashboard() {
+  const [showAllCourses, setShowAllCourses] = useState(false);
+const { enrollments: allEnrollments } = useSelector((state: any) => state.enrollmentReducer);
+
+const isEnrolled = (courseId: string) =>
+  allEnrollments.some(
+    (e: any) => e.user === currentUser._id && e.course === courseId
+  );
+
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const { enrollments } = db;
   const { courses } = useSelector((state: any) => state.coursesReducer);
   const dispatch = useDispatch(); 
   //const [courses, setCourses] = useState<any[]>(db.courses);
@@ -47,7 +60,18 @@ export default function Dashboard() {
 
   return (
     <div id="wd-dashboard">
-      <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
+      {/* <h1 id="wd-dashboard-title">Dashboard</h1> <hr /> */}
+      <div className="d-flex justify-content-between align-items-center">
+  <h1 id="wd-dashboard-title">Dashboard</h1>
+  <button
+    className="btn btn-info"
+    onClick={() => setShowAllCourses(!showAllCourses)}
+  >
+    {showAllCourses ? "My Enrollments" : "All Courses"}
+  </button>
+</div>
+<hr />
+
        <h5>New Course
           <button className="btn btn-primary float-end"
                   id="wd-add-new-course-click"
@@ -72,7 +96,24 @@ export default function Dashboard() {
 
         <Row xs={1} md={5} className="g-4">
     
-{courses.map((course: any) => (
+{/* {courses
+.filter((course: any) =>
+      enrollments.some(
+        (enrollment) =>
+          enrollment.user === currentUser._id &&
+          enrollment.course === course._id
+         ))
+ */}
+
+{courses
+  .filter((course: any) =>
+    showAllCourses ? true : isEnrolled(course._id)
+  )
+
+
+
+
+.map((course: any) => (
     <Col key={course._id} className="wd-dashboard-course" style={{ width: "300px" }}>
       <Card>
         <Link href={`/Courses/${course._id}/Home`}
@@ -85,6 +126,29 @@ export default function Dashboard() {
               {course.description} </CardText>
             <Button variant="primary"> Go </Button>
 
+{currentUser?.role !== "FACULTY" && (
+  isEnrolled(course._id) ? (
+    <Button
+      className="btn btn-danger ms-2"
+      onClick={(e) => {
+        e.preventDefault();
+        dispatch(unenroll({ userId: currentUser._id, courseId: course._id }));
+      }}
+    >
+      Unenroll
+    </Button>
+  ) : (
+    <Button
+      className="btn btn-success ms-2"
+      onClick={(e) => {
+        e.preventDefault();
+        dispatch(enroll({ userId: currentUser._id, courseId: course._id }));
+      }}
+    >
+      Enroll
+    </Button>
+  )
+)}
 
 
 <button onClick={(event) => {
