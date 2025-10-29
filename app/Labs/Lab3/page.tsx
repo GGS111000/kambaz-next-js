@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import IfElse from "./IfElse";
 import BooleanVariables from "./BooleanVariables";
 import VariablesAndConstants from "./VariablesAndConstants";
@@ -78,3 +79,12 @@ export default function Lab3() {
     </div>
   );
 }
+=======
+export default function Lab3() {
+    return (
+      <div>
+        <h2>Lab 3</h2>
+      </div>
+  );}
+  
+>>>>>>> 51f728575e7d8f5e6f459acc3b61e1198c7c1616

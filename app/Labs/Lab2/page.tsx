@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Container } from "react-bootstrap";
 import BackgroundColors from "./BackgroundColors";
 import Borders from "./Borders";
@@ -100,3 +101,12 @@ Here&apos;s another paragraph using a different ID and a different look and
       <BootstrapNavigation />
       <TOC />
     </Container>);}
+=======
+export default function Lab2() {
+    return (
+      <div>
+        <h2>Lab 2</h2>
+      </div>
+  );
+}
+>>>>>>> 51f728575e7d8f5e6f459acc3b61e1198c7c1616

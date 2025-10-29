@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -43,3 +44,14 @@ export default function AccountNavigation() {
     </div>
   );
 }
+=======
+import Link from "next/link";
+export default function AccountNavigation() {
+ return (
+   <div id="wd-account-navigation">
+     <Link href="/Account/Signin"> Signin </Link> <br />
+     <Link href="/Account/Signup"> Signup </Link> <br />
+     <Link href="/Account/Profile"> Profile </Link> <br />
+   </div>
+);}
+>>>>>>> 51f728575e7d8f5e6f459acc3b61e1198c7c1616

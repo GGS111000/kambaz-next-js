@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 
 
@@ -111,3 +112,25 @@ export default function CoursesLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+=======
+import { ReactNode } from "react";
+
+import CourseNavigation from "./Navigation";
+export default async function CoursesLayout(
+  { children, params }: { children: ReactNode; params: Promise<{ cid: string }> }) {
+ const { cid } = await params;
+ return (
+   <div id="wd-courses">
+     <h2>Courses {cid}</h2>
+     <hr />
+     <table>
+       <tbody>
+         <tr>
+           <td valign="top" width="200"> <CourseNavigation /> </td>
+           <td valign="top" width="100%"> {children} </td>
+         </tr>
+       </tbody>
+     </table>
+   </div>
+);}
+>>>>>>> 51f728575e7d8f5e6f459acc3b61e1198c7c1616

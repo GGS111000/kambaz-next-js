@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { MdAnalytics, MdDoNotDisturbAlt } from "react-icons/md";
 import { FaCheckCircle } from "react-icons/fa";
 import { BiImport } from "react-icons/bi";
@@ -35,3 +36,13 @@ export default function CourseStatus() {
        <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
        <IoNotificationsOutline className="me-2 fs-5" /> View Course Notifications </Button>
    </div> );}
+=======
+export default function CourseStatus() {
+  return (
+    <div id="wd-course-status">
+      <h2>Course Status</h2>
+      <button>Unpublish</button> <button>Publish</button>
+      {/* Complete on your own */}
+      <button>View Course Notifications</button>
+    </div> );}
+>>>>>>> 51f728575e7d8f5e6f459acc3b61e1198c7c1616

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 // // "use client";
@@ -181,3 +182,64 @@ export default function AssignmentsPage() {
     </div>
   );
 }
+=======
+import Link from "next/link";
+
+export default function Assignments() {
+  return (
+    <div id="wd-assignments">
+      <input placeholder="Search for Assignments"
+             id="wd-search-assignment" />
+      <button id="wd-add-assignment-group">+ Group</button>
+      <button id="wd-add-assignment">+ Assignment</button>
+      <h3 id="wd-assignments-title">
+        ASSIGNMENTS 40% of Total <button>+</button> </h3>
+      <ul id="wd-assignment-list">
+        <li className="wd-assignment-list-item">
+          <Link href={`/Courses/1234/Assignments/123`} className="wd-assignment-link">
+            A1 - ENV + HTML
+          </Link> </li>
+        
+          {/* Complete On Your Own */}
+        <li className="wd-assignment-list-item">
+          <a
+            href={`/Courses/111/Assignments/124`}
+            className="wd-assignment-link"
+          >
+            A2 - CSS Basics
+          </a>
+        </li>
+
+        <li className="wd-assignment-list-item">
+          <a
+            href={`/Courses/111/Assignments/124`}
+            className="wd-assignment-link"
+          >
+            A3 - JavaScript
+          </a>
+        </li>
+
+
+        <li className="wd-assignment-list-item">
+          <a
+            href={`/Courses/111/Assignments/124`}
+            className="wd-assignment-link"
+          >
+            A4 - GitHub
+          </a>
+        </li>
+
+        <li className="wd-assignment-list-item">
+          <a
+            href={`/Courses/111/Assignments/124`}
+            className="wd-assignment-link"
+          >
+            A5 - Debug
+          </a>
+        </li>
+
+      </ul>
+    </div>
+);}
+
+>>>>>>> 51f728575e7d8f5e6f459acc3b61e1198c7c1616
