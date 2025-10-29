@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -67,4 +68,8 @@ export default function AssignmentEditor() {
 
         <Form.Group className="mb-3">
           <Form.Label>Available Until</Form.Label>
-          <Form.Control name="availableUntil"
+          <Form.Control name="availableUntil"/>
+          </Form.Group>
+          </Form>
+          </div> 
+  )}

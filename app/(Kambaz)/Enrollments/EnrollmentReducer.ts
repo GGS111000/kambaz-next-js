@@ -1,6 +1,6 @@
 "use client";
 import { createSlice } from "@reduxjs/toolkit";
-import * as db from "../../Database";
+import * as db from "../Database";
 
 // 初始化：从 db 中获取 enrollments 数据
 const initialState = {

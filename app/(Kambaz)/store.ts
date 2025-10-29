@@ -11,8 +11,8 @@ const store = configureStore({
   reducer: {
     coursesReducer,
     modulesReducer,
-     accountReducer,
-     enrollmentReducer, 
+    accountReducer,
+    enrollmentReducer, 
   },
 });
 export default store;
