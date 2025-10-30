@@ -1,28 +1,26 @@
 "use client";
+
 import { configureStore } from "@reduxjs/toolkit";
-import accountReducer from "./Account/reducer";
+
+// 课程（你已有）
 import coursesReducer from "./Courses/reducer";
-import modulesReducer from "./Courses/Modules/reducer";
+
+// ✅ 模块 & 作业（按课件路径）
+import modulesReducer from "./Courses/[cid]/Modules/reducer";
 import assignmentsReducer from "./Courses/[cid]/Assignments/reducer";
 
 export const store = configureStore({
   reducer: {
-    accountReducer,
     coursesReducer,
+    // 主键
     modulesReducer,
-    modules: modulesReducer,          // ✅ 多加一层别名
     assignmentsReducer,
-    assignments: assignmentsReducer,  // ✅ 同理
+    // 兼容旧选择器（有的页面用 state.modules / state.assignments）
+    modules: modulesReducer,
+    assignments: assignmentsReducer,
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
 export default store;
-
-// 🔍 调试用：浏览器可访问 Redux 状态
-if (typeof window !== "undefined") {
-  // @ts-expect-error: attach store for dev-time debugging
-window.__REDUX_STORE__ = store;
-
-}

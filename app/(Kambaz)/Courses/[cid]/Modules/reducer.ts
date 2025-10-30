@@ -1,45 +1,55 @@
-// app/(Kambaz)/Courses/[cid]/Modules/reducer.ts
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { modules as modulesFromDB } from "../../../Database";
 import { v4 as uuidv4 } from "uuid";
 
+// ✅ 定义并导出类型，供外部 re-export 使用
 export type Module = {
   _id: string;
   name: string;
   course: string;
+  lessons: any[];
   editing?: boolean;
 };
 
-const initialState: { modules: Module[] } = { modules: [] }; // ← 不从 Database 导入
+type ModulesState = {
+  modules: Module[];
+};
+
+const initialState: ModulesState = {
+  modules: modulesFromDB as Module[],
+};
 
 const modulesSlice = createSlice({
   name: "modules",
   initialState,
   reducers: {
-    addModule: (state, { payload }: PayloadAction<{ name: string; course: string }>) => {
-      state.modules.push({
+    addModule: (state, action: PayloadAction<{ name: string; course: string }>) => {
+      const { name, course } = action.payload;
+      const newModule: Module = {
         _id: uuidv4(),
-        name: payload.name,
-        course: payload.course,
-      });
+        name,
+        course,
+        lessons: [],
+      };
+      state.modules = [...state.modules, newModule];
     },
-    deleteModule: (state, { payload }: PayloadAction<string>) => {
-      state.modules = state.modules.filter((m) => m._id !== payload);
+    deleteModule: (state, action: PayloadAction<string>) => {
+      const moduleId = action.payload;
+      state.modules = state.modules.filter((m) => m._id !== moduleId);
     },
-    editModule: (state, { payload }: PayloadAction<string>) => {
+    updateModule: (state, action: PayloadAction<Module>) => {
+      const updatedModule  = action.payload;
+      state.modules = state.modules.map((m) => (m._id === updatedModule ._id ? updatedModule  : m));
+    },
+    editModule: (state, action: PayloadAction<string>) => {
+      const moduleId = action.payload;
       state.modules = state.modules.map((m) =>
-        m._id === payload ? { ...m, editing: true } : { ...m, editing: false }
-      );
-    },
-    updateModule: (state, { payload }: PayloadAction<Module>) => {
-      state.modules = state.modules.map((m) =>
-        m._id === payload._id ? { ...payload, editing: false } : m
+        m._id === moduleId ? { ...m, editing: true } : m
       );
     },
   },
 });
 
-export const { addModule, deleteModule, editModule, updateModule } =
-  modulesSlice.actions;
-
+export const { addModule, deleteModule, updateModule, editModule } = modulesSlice.actions;
 export default modulesSlice.reducer;
