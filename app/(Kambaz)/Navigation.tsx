@@ -1,49 +1,41 @@
-"use client"
-import { AiOutlineDashboard } from "react-icons/ai";
-import { IoCalendarOutline } from "react-icons/io5";
-import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
-import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
-import { usePathname } from "next/navigation";
+"use client";
+
 import Link from "next/link";
-import { ListGroup, ListGroupItem } from "react-bootstrap";
+import Image from "next/image";
+
 export default function KambazNavigation() {
-  const pathname = usePathname();
-  const links = [
-    { label: "Dashboard", path: "/Dashboard", icon: AiOutlineDashboard },
-    { label: "Courses",   path: "/Courses",  icon: LiaBookSolid },
-    { label: "Calendar",  path: "/Calendar",  icon: IoCalendarOutline },
-    { label: "Inbox",     path: "/Inbox",     icon: FaInbox },
-    { label: "Labs",      path: "/Labs",      icon: LiaCogSolid },
-  ];
   return (
-    <ListGroup id="wd-kambaz-navigation" style={{ width: 80 }}
-         className="rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2">
-      <ListGroupItem id="wd-neu-link" target="_blank" href="https://www.northeastern.edu/"
-        action className="bg-black border-0 text-center">
-        <img src="/images/NEU.png" width="75px" /></ListGroupItem>
-      <ListGroupItem as={Link} href="/Account"
-        className={`text-center border-0 bg-black
-            ${pathname?.startsWith("/Account") ? "bg-white text-danger" : "bg-black text-white"}`}>
-        <FaRegCircleUser
-          className={`fs-1 ${pathname?.startsWith("/Account") ? "text-danger" : "text-white"}`} />
-        <br />
-        Account
-      </ListGroupItem>
-      {links.map((link) => {
-        const active = pathname?.startsWith(link.path);
-        return (
-          <ListGroupItem
-            key={`${link.label}-${link.path}`}
-            as={Link}
-            href={link.path}
-            className={`bg-black text-center border-0 ${active ? "text-danger bg-white" : "text-white bg-black"}`}>
-            {link.icon({ className: `fs-1 ${active ? "text-danger" : "text-white"}` })}
-            <br />
-            {link.label}
-          </ListGroupItem>
-        );
-      })}
-    </ListGroup>
+    <nav className="p-3 bg-black text-white" style={{ minHeight: "100vh", width: 260 }}>
+      <div className="d-flex align-items-center mb-3">
+        {/* 用 next/image 并添加 alt */}
+        <Image
+          src="/images/logo.png"
+          alt="Kambaz Logo"
+          width={36}
+          height={36}
+          className="me-2 rounded"
+          priority
+        />
+        <span className="fw-bold">Kambaz</span>
+      </div>
+
+      <ul className="list-unstyled">
+        <li className="mb-2">
+          <Link href="/Dashboard" className="text-decoration-none text-white">
+            Dashboard
+          </Link>
+        </li>
+        <li className="mb-2">
+          <Link href="/Courses" className="text-decoration-none text-white">
+            Courses
+          </Link>
+        </li>
+        <li className="mb-2">
+          <Link href="/Diagnostics/StoreDebug" className="text-decoration-none text-white">
+            Store Debug
+          </Link>
+        </li>
+      </ul>
+    </nav>
   );
 }
-
