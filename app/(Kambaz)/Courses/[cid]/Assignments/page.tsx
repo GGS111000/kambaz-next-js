@@ -4,25 +4,29 @@
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
+import type { RootState } from "@/app/(Kambaz)/store";
 import {
   addAssignment,
   updateAssignment,
   deleteAssignment,
   editAssignment,
   type Assignment,
-} from "../Assignments"; // ← 统一入口，避免实例分叉
-import { FormControl } from "react-bootstrap";
+} from "../Assignments"; // 统一入口
 
 export default function AssignmentsPage() {
   const { cid } = useParams<{ cid: string }>() ?? { cid: "" };
   const router = useRouter();
   const dispatch = useDispatch();
 
-  // 兼容两种键名（store 里也有别名）
-  const all =
-    (useSelector((s: any) => s?.assignments?.assignments) ??
-      useSelector((s: any) => s?.assignmentsReducer?.assignments) ??
-      []) as Assignment[];
+  // ✅ 无条件调用两个 selector
+  const aFromAlias = useSelector((s: RootState) => s.assignments?.assignments);
+  const aFromReducer = useSelector((s: RootState) => s.assignmentsReducer?.assignments);
+
+  // ✅ 把“取别名或主键”的逻辑放进 useMemo
+  const all = useMemo<Assignment[]>(
+    () => (aFromAlias ?? aFromReducer ?? []) as Assignment[],
+    [aFromAlias, aFromReducer]
+  );
 
   // 只显示当前课程
   const list = useMemo(
@@ -30,7 +34,7 @@ export default function AssignmentsPage() {
     [all, cid]
   );
 
-  // 顶部“快速新增”（保底可用）
+  // 顶部“快速新增”
   const [title, setTitle] = useState("");
   const [points, setPoints] = useState<number | "">("");
   const [due, setDue] = useState("");
@@ -53,7 +57,7 @@ export default function AssignmentsPage() {
 
   return (
     <div className="p-2">
-      {/* 顶部：快速新增（不依赖弹窗，保证能看到变化） */}
+      {/* 顶部：快速新增 */}
       <div className="d-flex align-items-end gap-2 mb-3">
         <div>
           <label className="form-label">Title</label>
@@ -134,7 +138,8 @@ export default function AssignmentsPage() {
                   </div>
                 </div>
               ) : (
-                <FormControl
+                <input
+                  className="form-control"
                   autoFocus
                   defaultValue={a.title}
                   onChange={(e) =>
@@ -157,7 +162,7 @@ export default function AssignmentsPage() {
               )}
             </div>
 
-            {/* 其他字段（可选） */}
+            {/* 其他字段（可选展示） */}
             <div className="d-flex gap-4">
               <div>
                 <label className="form-label">Points</label>

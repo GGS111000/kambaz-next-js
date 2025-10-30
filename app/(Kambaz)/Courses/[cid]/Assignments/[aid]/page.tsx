@@ -5,32 +5,36 @@ import { Form } from "react-bootstrap";
 import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
+import type { RootState } from "@/app/(Kambaz)/store";
 import {
   updateAssignment,
   deleteAssignment,
   type Assignment,
-} from "../../Assignments"; // ← 统一入口
+} from "../../Assignments"; // 统一入口，避免实例分叉
 
 export default function AssignmentEditorPage() {
   const { cid, aid } = useParams<{ cid: string; aid: string }>();
   const router = useRouter();
   const dispatch = useDispatch();
 
-  // 兼容两种键名
-  const all =
-    (useSelector((s: any) => s?.assignments?.assignments) ??
-      useSelector((s: any) => s?.assignmentsReducer?.assignments) ??
-      []) as Assignment[];
+  // ✅ 统一“无条件调用”：各取一遍，再在 useMemo 里合并
+  const aFromAlias = useSelector((s: RootState) => s.assignments?.assignments);
+  const aFromReducer = useSelector((s: RootState) => s.assignmentsReducer?.assignments);
+
+  // ✅ 把 all 的“逻辑合并”放进 useMemo，依赖可控
+  const all = useMemo<Assignment[]>(
+    () => (aFromAlias ?? aFromReducer ?? []) as Assignment[],
+    [aFromAlias, aFromReducer]
+  );
 
   const assignment = useMemo(
     () => all.find((x) => x._id === aid),
     [all, aid]
   );
 
-  // 简单的“如果不存在就回列表”
+  // 若不存在，回列表
   useEffect(() => {
     if (!assignment) {
-      // 可改成创建模式，这里先回到列表
       router.replace(`/Courses/${cid}/Assignments`);
     }
   }, [assignment, cid, router]);
@@ -38,8 +42,7 @@ export default function AssignmentEditorPage() {
   const [form, setForm] = useState({
     title: assignment?.title ?? "",
     description:
-      assignment?.description ??
-      "Submit the link to your app landing page.",
+      assignment?.description ?? "Submit the link to your app landing page.",
     points: assignment?.points ?? 100,
     due: assignment?.due ?? "",
     availableFrom: assignment?.availableFrom ?? "",
