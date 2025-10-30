@@ -1,36 +1,63 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { redirect } from "next/dist/client/components/navigation";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setCurrentUser } from "../reducer";
+import { Button, FormControl } from "react-bootstrap";
+export default function Profile() {
+ const [profile, setProfile] = useState<any>({});
+ const dispatch = useDispatch();
+ const { currentUser } = useSelector((state: any) => state.accountReducer);
+ const fetchProfile = () => {
+   if (!currentUser) return redirect("/Account/Signin");
+   setProfile(currentUser);
+ };
+ const signout = () => {
+   dispatch(setCurrentUser(null));
+   redirect("/Account/Signin");
+ };
+ useEffect(() => {
+   fetchProfile();
+ }, []);
+ return (
+   <div className="wd-profile-screen">
+     <h3>Profile</h3>
+     {profile && (
+       <div>
+         <FormControl id="wd-username" className="mb-2"
+           defaultValue={profile.username}
+           onChange={(e) => setProfile({ ...profile, username: e.target.value }) }
+         />
+         <FormControl id="wd-password" className="mb-2"
+           defaultValue={profile.password}
+           onChange={(e) => setProfile({ ...profile, password: e.target.value }) }
+         />
+         <FormControl id="wd-firstname" className="mb-2"
+           defaultValue={profile.firstName}
+           onChange={(e) => setProfile({ ...profile, firstName: e.target.value }) }
+         />
+         <FormControl id="wd-lastname" className="mb-2"
+           defaultValue={profile.lastName}
+           onChange={(e) => setProfile({ ...profile, lastName: e.target.value }) } />
+         <FormControl id="wd-dob" className="mb-2" type="date"
+           defaultValue={profile.dob}
+           onChange={(e) => setProfile({ ...profile, dob: e.target.value })} />
+         <FormControl id="wd-email" className="mb-2"
+           defaultValue={profile.email}
+           onChange={(e) => setProfile({ ...profile, email: e.target.value })} />
+         <select className="form-control mb-2" id="wd-role" 
+           onChange={(e) => setProfile({ ...profile, role: e.target.value })} >
+           <option value="USER">User</option>
+           <option value="ADMIN">Admin</option>
+           <option value="FACULTY">Faculty</option>{" "}
+           <option value="STUDENT">Student</option>
+         </select>
+         <Button onClick={signout} className="w-100 mb-2" id="wd-signout-btn">
+           Sign out
+         </Button>
+       </div>
+     )}
+   </div>
+);}
 
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { useRouter } from "next/navigation";
-import type { RootState } from "@/app/(Kambaz)/store";
-
-// 关键：禁止该页面在构建期被静态预渲染
-export const dynamic = "force-dynamic";
-
-export default function AccountProfilePage() {
-  // 选择器兜底，避免 undefined 解构崩溃
-  const account = useSelector((s: RootState) => s.accountReducer ?? { currentUser: null });
-  const { currentUser } = account as { currentUser: null | { name?: string; email?: string } };
-
-  const router = useRouter();
-  useEffect(() => {
-    if (!currentUser) {
-      // 未登录就跳登录页（客户端执行，不参与预渲染）
-      router.replace("/Account/Signin");
-    }
-  }, [currentUser, router]);
-
-  if (!currentUser) {
-    // 构建期/客户端首次渲染时都先给个占位，避免报错
-    return <div className="p-3">Redirecting to sign in…</div>;
-  }
-
-  return (
-    <div className="p-3">
-      <h2 className="mb-3">Profile</h2>
-      <div className="mb-2"><strong>Name:</strong> {currentUser.name ?? "—"}</div>
-      <div className="mb-2"><strong>Email:</strong> {currentUser.email ?? "—"}</div>
-    </div>
-  );
-}
