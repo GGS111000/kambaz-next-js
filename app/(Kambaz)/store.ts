@@ -22,6 +22,7 @@ export default store;
 
 // 🔍 调试用：浏览器可访问 Redux 状态
 if (typeof window !== "undefined") {
-  // @ts-ignore
-  window.__REDUX_STORE__ = store;
+  // @ts-expect-error: attach store for dev-time debugging
+window.__REDUX_STORE__ = store;
+
 }
