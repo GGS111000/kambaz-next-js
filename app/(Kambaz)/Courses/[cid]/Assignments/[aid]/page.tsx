@@ -18,8 +18,9 @@ export default function AssignmentEditorPage() {
   const dispatch = useDispatch();
 
   // ✅ 统一“无条件调用”：各取一遍，再在 useMemo 里合并
-  const aFromAlias = useSelector((s: RootState) => s.assignments?.assignments);
-  const aFromReducer = useSelector((s: RootState) => s.assignmentsReducer?.assignments);
+  // 把这两行改掉 👇
+const aFromAlias = useSelector((s: any) => s.assignments?.assignments);
+const aFromReducer = useSelector((s: any) => s.assignmentsReducer?.assignments);
 
   // ✅ 把 all 的“逻辑合并”放进 useMemo，依赖可控
   const all = useMemo<Assignment[]>(
