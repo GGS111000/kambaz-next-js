@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice } from "@reduxjs/toolkit";
+
 const initialState = {
-  currentUser: null,
+  currentUser: null as any,
 };
+
 const accountSlice = createSlice({
   name: "account",
   initialState,
@@ -11,6 +14,6 @@ const accountSlice = createSlice({
     },
   },
 });
+
 export const { setCurrentUser } = accountSlice.actions;
 export default accountSlice.reducer;
-

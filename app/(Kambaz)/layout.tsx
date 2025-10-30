@@ -19,14 +19,14 @@ export default function KambazLayout({
             top: 0,
             zIndex: 1100,
             minHeight: "100vh",
-            width: 260, // ← 想右移多少，就把这里和下面 padding 协调起来
+            width: 120, // narrower left nav per design request
           }}
         >
           <KambazNavigation />
         </aside>
 
-        {/* 在这里右移一点 */}
-        <main id="wd-content" className="flex-fill" style={{ minWidth: 0, paddingLeft: 16 }}>
+        {/* main content — reduce left padding to match narrower nav */}
+        <main id="wd-content" className="flex-fill" style={{ minWidth: 0, paddingLeft: 8 }}>
           {children}
         </main>
       </div>

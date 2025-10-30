@@ -1,15 +1,6 @@
-import { configureStore } from "@reduxjs/toolkit";
-import helloReducer   from "../Lab4/ReduxExamples/HelloRedux/helloReducer";
-import counterReducer from "../Lab4/ReduxExamples/CounterRedux/counterReducer";
-import addReducer     from "../Lab4/ReduxExamples/AddRedux/addReducer";
-import todosReducer from "../Lab4/ReduxExamples/todos/todosReducer"; 
-
-const store = configureStore({
-  reducer: {
-    helloReducer,
-    counterReducer,
-    addReducer,
-    todosReducer,
-  },
-});
-export default store;
+// This file intentionally kept as a minimal route page so /Labs/store exists.
+// It should not configure or export application stores — store implementation
+// lives in `app/Labs/store/index.ts` (non-route module). Keep this page inert.
+export default function LabsStorePage() {
+  return null;
+}

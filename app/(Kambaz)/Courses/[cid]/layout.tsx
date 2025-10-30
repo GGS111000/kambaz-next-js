@@ -31,14 +31,30 @@ export default function CoursesLayout({ children }: { children: ReactNode }) {
       <hr />
 
       <div className="d-flex">
-        {/* 第二栏导航 - 可切换显示 */}
+        {/* 左一：课程详情 */}
+        <div
+          style={{ minWidth: 120 }}
+          className="bg-white border me-2 p-2 d-none d-md-block"
+        >
+          <h5 className="mb-1">{course?.name ?? "Course"}</h5>
+          <div className="text-muted small">{course?.number}</div>
+          <div className="small mt-2">
+            <div>Start: {course?.startDate ?? "-"}</div>
+            <div>End: {course?.endDate ?? "-"}</div>
+          </div>
+          <div className="mt-2 small text-truncate" style={{ maxHeight: 80 }}>
+            {course?.description}
+          </div>
+        </div>
+
+        {/* 左二：第二栏导航 - 可切换显示 */}
         {showNav && (
           <div
             style={{
               minWidth: 150,
               zIndex: 999,
             }}
-            className="bg-light shadow position-relative d-none d-md-block"
+            className="bg-light shadow position-relative me-2 d-none d-md-block"
           >
             <CourseNavigation params={{ cid: String(cid) }} />
           </div>

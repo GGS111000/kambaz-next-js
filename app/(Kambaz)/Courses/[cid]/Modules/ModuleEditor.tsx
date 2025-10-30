@@ -1,23 +1,50 @@
-import { Modal, FormControl, Button } from "react-bootstrap";
-export default function ModuleEditor({ show, handleClose, dialogTitle, moduleName, setModuleName, addModule,}: {
- show: boolean; handleClose: () => void; dialogTitle: string; moduleName: string; setModuleName: (name: string) => void;
- addModule: () => void; }) {
- return (
-  <Modal show={show} onHide={handleClose}>
-   <Modal.Header closeButton>
-    <Modal.Title>{dialogTitle}</Modal.Title>
-   </Modal.Header>
-   <Modal.Body>
-    <FormControl value={moduleName}
-     onChange={(e) => { setModuleName(e.target.value); }} />
-   </Modal.Body>
-   <Modal.Footer>
-    <Button variant="secondary" onClick={handleClose}> Cancel </Button>
-    <Button variant="primary"
-     onClick={() => {
-      addModule();
-      handleClose();
-     }} > Add Module </Button>
-   </Modal.Footer>
-  </Modal>
-);}
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import { Modal, Button, FormControl } from "react-bootstrap";
+
+export default function ModuleEditor({
+  show,
+  title,
+  name,
+  setName,
+  onSave,
+  onCancel,
+  saveText = "Save",
+}: {
+  show: boolean;
+  title: string;
+  name: string;
+  setName: (v: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+  saveText?: string;
+}) {
+  return (
+    <Modal show={show} onHide={onCancel} centered>
+      <Modal.Header closeButton>
+        <Modal.Title className="text-danger">{title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <label className="form-label">Module name</label>
+        <FormControl
+          autoFocus
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") onSave();
+          }}
+          placeholder="e.g., Week 1: Intro"
+        />
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button variant="danger" onClick={onSave}>
+          {saveText}
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+}

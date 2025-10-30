@@ -1,37 +1,45 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Nav, NavItem, NavLink } from "react-bootstrap";
-import { useSelector } from "react-redux";
- 
+
 export default function AccountNavigation() {
-  const pathname = (usePathname() ?? "").toLowerCase();
- 
-  // ✅ don't destructure from possibly-undefined
-  const currentUser =
-    useSelector((state: any) => state?.accountReducer?.currentUser) ?? null;
- 
-  const items = currentUser
-    ? [{ label: "Profile", href: "/Account/Profile" }]
-    : [
-        { label: "Signin", href: "/Account/Signin" },
-        { label: "Signup", href: "/Account/Signup" },
-      ];
- 
+  const pathname = usePathname();
+
+  const links = [
+    { href: "/Account/Signin", label: "Signin" },
+    { href: "/Account/Signup", label: "Signup" },
+    { href: "/Account/Profile", label: "Profile" },
+  ];
+
   return (
-<Nav variant="pills">
-      {items.map(({ label, href }) => (
-<NavItem key={label}>
-<NavLink
-            as={Link}
-            href={href}
-            active={pathname === href.toLowerCase()}
->
-            {label}
-</NavLink>
-</NavItem>
-      ))}
-</Nav>
+    <div
+      id="wd-account-navigation"
+      className="d-flex flex-column bg-light vh-100 p-3"
+      style={{ width: 200 }}
+    >
+      {links.map((link) => {
+        const isActive = pathname.startsWith(link.href);
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            className={`d-flex align-items-center mb-3 text-decoration-none fw-bold ${
+              isActive ? "text-dark" : "text-danger"
+            }`}
+          >
+            {/* 左侧黑色短 bar */}
+            <div
+              style={{
+                width: "5px",
+                height: "20px",
+                backgroundColor: isActive ? "black" : "transparent",
+                marginRight: "8px",
+              }}
+            />
+            {link.label}
+          </Link>
+        );
+      })}
+    </div>
   );
 }

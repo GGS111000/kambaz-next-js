@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// 为了“保底能跑”，不用 uuid 依赖，退化成时间戳 + 随机数
+// 不依赖 uuid，避免环境差异；足够独特就行
 const genId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
 export type Module = {
   _id: string;
   name: string;
-  course: string;     // 当前课程 ID，列表会按它过滤
+  course: string;     // ← 所属课程ID（渲染时按它过滤）
   lessons?: any[];
   editing?: boolean;
 };
@@ -24,29 +23,24 @@ const modulesSlice = createSlice({
   name: "modules",
   initialState,
   reducers: {
-    addModule: (state, { payload }: PayloadAction<AddPayload>) => {
-      // 关键：必须写入 course；否则前端按 cid 过滤时会被排除
-      const newModule: Module = {
+    addModule(state, { payload }: PayloadAction<AddPayload>) {
+      state.modules.push({
         _id: genId(),
         name: payload.name,
         course: String(payload.course),
         lessons: [],
         editing: false,
-      };
-      state.modules.push(newModule);
+      });
     },
-
-    deleteModule: (state, { payload: moduleId }: PayloadAction<string>) => {
+    deleteModule(state, { payload: moduleId }: PayloadAction<string>) {
       state.modules = state.modules.filter((m) => m._id !== moduleId);
     },
-
-    updateModule: (state, { payload: module }: PayloadAction<Module>) => {
+    updateModule(state, { payload: module }: PayloadAction<Module>) {
       state.modules = state.modules.map((m) =>
         m._id === module._id ? { ...m, ...module } : m
       );
     },
-
-    editModule: (state, { payload: moduleId }: PayloadAction<string>) => {
+    editModule(state, { payload: moduleId }: PayloadAction<string>) {
       state.modules = state.modules.map((m) =>
         m._id === moduleId ? { ...m, editing: true } : m
       );
@@ -56,4 +50,5 @@ const modulesSlice = createSlice({
 
 export const { addModule, deleteModule, updateModule, editModule } =
   modulesSlice.actions;
+
 export default modulesSlice.reducer;

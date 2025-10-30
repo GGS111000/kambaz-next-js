@@ -3,33 +3,34 @@
 import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { addAssignment } from "@/app/(Kambaz)/Courses/Assignments/reducer";
-import { v4 as uuidv4 } from "uuid";
-import { Button, Form } from "react-bootstrap";
+import { addAssignment } from "../Assignments/reducer";
+import { Form } from "react-bootstrap";
 
 export default function AssignmentEditor() {
   const { cid } = useParams<{ cid: string }>();
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const [assignment, setAssignment] = useState({
-    _id: uuidv4(),
-    name: "",
+  const [form, setForm] = useState({
+    title: "",
     description: "",
     points: 100,
     due: "",
     availableFrom: "",
     availableUntil: "",
-    course: cid,
   });
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setAssignment({ ...assignment, [name]: value });
+    setForm((s) => ({ ...s, [name]: value }));
   };
 
-  const handleSave = () => {
-    dispatch(addAssignment(assignment));
+  const handleSave = (e?: any) => {
+    if (e && e.preventDefault) e.preventDefault();
+    // Let the reducer generate the _id
+    const payload = { ...form, course: cid };
+    console.debug("AssignmentEditor: dispatching addAssignment", payload);
+    dispatch(addAssignment(payload));
     router.push(`/Courses/${cid}/Assignments`);
   };
 
@@ -39,37 +40,47 @@ export default function AssignmentEditor() {
 
   return (
     <div className="container mt-3">
-      <h2>New Assignment</h2>
-      <Form>
+      <h2 className="fw-bold text-danger mb-3">New Assignment</h2>
+      <Form onSubmit={handleSave}>
         <Form.Group className="mb-3">
-          <Form.Label>Name</Form.Label>
-          <Form.Control name="name" value={assignment.name} onChange={handleChange} />
+          <Form.Label>Title</Form.Label>
+          <Form.Control name="title" value={form.title} onChange={handleChange} />
         </Form.Group>
 
         <Form.Group className="mb-3">
           <Form.Label>Description</Form.Label>
-          <Form.Control name="description" value={assignment.description} onChange={handleChange} as="textarea" />
+          <Form.Control name="description" value={form.description} onChange={handleChange} as="textarea" />
         </Form.Group>
 
         <Form.Group className="mb-3">
           <Form.Label>Points</Form.Label>
-          <Form.Control name="points" type="number" value={assignment.points} onChange={handleChange} />
+          <Form.Control name="points" type="number" value={form.points} onChange={handleChange} />
         </Form.Group>
 
         <Form.Group className="mb-3">
           <Form.Label>Due Date</Form.Label>
-          <Form.Control name="due" type="datetime-local" value={assignment.due} onChange={handleChange} />
+          <Form.Control name="due" type="datetime-local" value={form.due} onChange={handleChange} />
         </Form.Group>
 
         <Form.Group className="mb-3">
           <Form.Label>Available From</Form.Label>
-          <Form.Control name="availableFrom" type="datetime-local" value={assignment.availableFrom} onChange={handleChange} />
+          <Form.Control name="availableFrom" type="datetime-local" value={form.availableFrom} onChange={handleChange} />
         </Form.Group>
 
         <Form.Group className="mb-3">
           <Form.Label>Available Until</Form.Label>
-          <Form.Control name="availableUntil"/>
-          </Form.Group>
-          </Form>
-          </div> 
-  )}
+          <Form.Control name="availableUntil" type="datetime-local" value={form.availableUntil} onChange={handleChange} />
+        </Form.Group>
+
+        <div className="text-end">
+          <button type="button" className="btn btn-secondary me-2" onClick={handleCancel}>
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-danger">
+            Save
+          </button>
+        </div>
+      </Form>
+    </div>
+  );
+}

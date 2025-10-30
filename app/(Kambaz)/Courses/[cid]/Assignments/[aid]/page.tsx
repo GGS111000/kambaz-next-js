@@ -1,102 +1,106 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 "use client";
 
 import { Form } from "react-bootstrap";
 import { useParams, useRouter } from "next/navigation";
-// import Link from "next/link"; // 未使用，移除
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { updateAssignment, deleteAssignment } from "../../Assignments/reducer";
-import { FaTrash } from "react-icons/fa";
+import { useEffect, useMemo, useState } from "react";
+import {
+  updateAssignment,
+  deleteAssignment,
+  type Assignment,
+} from "../../Assignments"; // ← 统一入口
 
-export default function AssignmentEditor() {
+export default function AssignmentEditorPage() {
   const { cid, aid } = useParams<{ cid: string; aid: string }>();
-  const dispatch = useDispatch();
   const router = useRouter();
+  const dispatch = useDispatch();
 
-  // 兼容：state.assignments 或 state.assignmentsReducer
-  const assignment = useSelector((state: any) =>
-    (state.assignments ?? state.assignmentsReducer)?.assignments?.find(
-      (a: any) => a._id === aid
-    )
+  // 兼容两种键名
+  const all =
+    (useSelector((s: any) => s?.assignments?.assignments) ??
+      useSelector((s: any) => s?.assignmentsReducer?.assignments) ??
+      []) as Assignment[];
+
+  const assignment = useMemo(
+    () => all.find((x) => x._id === aid),
+    [all, aid]
   );
 
-  // 初始化表单
+  // 简单的“如果不存在就回列表”
+  useEffect(() => {
+    if (!assignment) {
+      // 可改成创建模式，这里先回到列表
+      router.replace(`/Courses/${cid}/Assignments`);
+    }
+  }, [assignment, cid, router]);
+
   const [form, setForm] = useState({
-    title: assignment?.title || "",
+    title: assignment?.title ?? "",
     description:
-      assignment?.description ||
-      "The assignment is available online. Submit a link to the landing page of your Web application running on Netlify.\n\nThe landing page should include the following:\n\n• Your full name and section\n• Links to each of the lab assignments\n• Link to the Kambaz application\n• Links to all relevant source code repositories\n\nThe Kambaz application should include a link to navigate back to the landing page.",
+      assignment?.description ??
+      "Submit the link to your app landing page.",
     points: assignment?.points ?? 100,
-    due: assignment?.due || "2025-05-13T23:59",
-    availableFrom: assignment?.availableFrom || "2025-05-06T00:00",
-    availableUntil: assignment?.availableUntil || "",
+    due: assignment?.due ?? "",
+    availableFrom: assignment?.availableFrom ?? "",
+    availableUntil: assignment?.availableUntil ?? "",
   });
 
-  // 如果异步或切换 aid 后拿到 assignment，回填一次
   useEffect(() => {
     if (assignment) {
       setForm({
         title: assignment.title ?? "",
         description: assignment.description ?? "",
         points: assignment.points ?? 100,
-        due: assignment.due ?? "2025-05-13T23:59",
-        availableFrom: assignment.availableFrom ?? "2025-05-06T00:00",
+        due: assignment.due ?? "",
+        availableFrom: assignment.availableFrom ?? "",
         availableUntil: assignment.availableUntil ?? "",
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assignment, aid]);
+  }, [assignment]);
 
-  const handleChange = (
+  const onChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  ) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
-  // ✅ 统一用表单提交事件，阻止默认提交，避免卡住
-  const handleSubmit = (e: React.FormEvent) => {
+  const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(updateAssignment({ _id: aid, course: cid, ...form }));
+    if (!aid) return;
+    dispatch(
+      updateAssignment({
+        _id: aid,
+        course: String(cid),
+        ...form,
+        points: Number(form.points) || 0,
+      } as Assignment)
+    );
     router.push(`/Courses/${cid}/Assignments`);
   };
 
-  const handleCancel = () => {
-    // 不触发表单提交，直接跳转
-    router.push(`/Courses/${cid}/Assignments`);
-  };
-
-  // 删除相关逻辑
-  const [showConfirm, setShowConfirm] = useState(false);
-  const handleDelete = () => {
+  const onDelete = () => {
+    if (!aid) return;
     dispatch(deleteAssignment(aid));
-    setShowConfirm(false);
     router.push(`/Courses/${cid}/Assignments`);
   };
+
+  const onCancel = () => {
+    router.push(`/Courses/${cid}/Assignments`);
+  };
+
+  if (!assignment) return null;
 
   return (
     <div className="container mt-4" id="wd-assignments-editor">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3 className="fw-bold text-danger">{form.title || "Assignment"}</h3>
-        <FaTrash
-          className="text-danger cursor-pointer"
-          role="button"
-          onClick={() => setShowConfirm(true)}
-          title="Delete assignment"
-        />
-      </div>
+      <h3 className="fw-bold text-danger">{form.title || "Assignment"}</h3>
       <hr />
-
-      {/* ✅ 用 onSubmit 管理 Save，阻止默认提交 */}
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={onSubmit}>
         <Form.Group className="mb-3" controlId="wd-name">
           <Form.Label className="fw-semibold">Assignment Name</Form.Label>
           <Form.Control
             type="text"
             name="title"
             value={form.title}
-            onChange={handleChange}
+            onChange={onChange}
           />
         </Form.Group>
 
@@ -107,7 +111,7 @@ export default function AssignmentEditor() {
             rows={8}
             name="description"
             value={form.description}
-            onChange={handleChange}
+            onChange={onChange}
             style={{ whiteSpace: "pre-line" }}
           />
         </Form.Group>
@@ -118,25 +122,19 @@ export default function AssignmentEditor() {
             type="number"
             name="points"
             value={form.points}
-            onChange={handleChange}
+            onChange={onChange}
           />
         </Form.Group>
 
         <Form.Group className="mb-3 border rounded p-3">
           <Form.Label className="fw-semibold mb-2">Assign</Form.Label>
-
-          <Form.Group className="mb-3" controlId="wd-assign-to">
-            <Form.Label className="fw-semibold small">Assign to</Form.Label>
-            <Form.Control type="text" defaultValue="Everyone" disabled />
-          </Form.Group>
-
           <Form.Group className="mb-3" controlId="wd-due-date">
             <Form.Label className="fw-semibold small">Due</Form.Label>
             <Form.Control
               type="datetime-local"
               name="due"
               value={form.due}
-              onChange={handleChange}
+              onChange={onChange}
             />
           </Form.Group>
 
@@ -147,64 +145,31 @@ export default function AssignmentEditor() {
                 type="datetime-local"
                 name="availableFrom"
                 value={form.availableFrom}
-                onChange={handleChange}
+                onChange={onChange}
               />
               <span className="align-self-center">Until</span>
               <Form.Control
                 type="datetime-local"
                 name="availableUntil"
                 value={form.availableUntil}
-                onChange={handleChange}
+                onChange={onChange}
               />
             </div>
           </Form.Group>
         </Form.Group>
 
         <div className="mt-4 text-end">
-          {/* ❗ Cancel 必须是 type="button" 才不会提交表单 */}
-          <button
-            type="button"
-            className="btn btn-secondary me-2"
-            onClick={handleCancel}
-          >
+          <button type="button" className="btn btn-secondary me-2" onClick={onCancel}>
             Cancel
           </button>
-
-          {/* ❗ Save 用 type="submit"，走 onSubmit */}
           <button type="submit" className="btn btn-danger">
             Save
           </button>
+          <button type="button" className="btn btn-outline-danger ms-2" onClick={onDelete}>
+            Delete
+          </button>
         </div>
       </Form>
-
-      {/* 删除确认弹窗 */}
-      {showConfirm && (
-        <div
-          className="position-absolute bg-white border rounded p-4 shadow"
-          style={{
-            top: "40%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            zIndex: 9999,
-            minWidth: "300px",
-          }}
-        >
-          <p>
-            Are you sure you want to delete <strong>{form.title}</strong>?
-          </p>
-          <div className="d-flex justify-content-end mt-3">
-            <button
-              className="btn btn-secondary me-2"
-              onClick={() => setShowConfirm(false)}
-            >
-              Cancel
-            </button>
-            <button className="btn btn-danger" onClick={handleDelete}>
-              Delete
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

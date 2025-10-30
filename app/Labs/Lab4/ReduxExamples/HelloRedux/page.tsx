@@ -1,11 +1,13 @@
-import { useSelector, useDispatch } from "react-redux";
+"use client";
 export default function HelloRedux() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { message } = useSelector((state: any) => state.helloReducer);
+  // Keep this example minimal during build: avoid using useSelector at route-level
+  // which may trigger prerender errors. The interactive Redux demo is used inside
+  // the Lab4 page wrapped with a Provider.
   return (
     <div id="wd-hello-redux">
       <h3>Hello Redux</h3>
-      <h4>{message}</h4> <hr />
+      <h4>Interactive demo available from the Lab4 page</h4>
+      <hr />
     </div>
   );
 }

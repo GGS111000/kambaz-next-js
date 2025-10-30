@@ -1,16 +1,41 @@
 "use client";
 import { createSlice } from "@reduxjs/toolkit";
 import * as db from "../Database";
+import { v4 as uuidv4 } from "uuid";
 
-// 初始化：从 db 中获取 enrollments 数据
+// Initialize from db enrollments
 const initialState = {
-  enrollments: db.enrollments,
+  enrollments: db.enrollments || [],
 };
 
 const enrollmentSlice = createSlice({
   name: "enrollments",
   initialState,
   reducers: {
+    // Enroll a user in a course (idempotent)
+    enroll: (state, action) => {
+      const { userId, courseId } = action.payload;
+      const exists = state.enrollments.find(
+        (enr) => enr.user === userId && enr.course === courseId
+      );
+      if (!exists) {
+        // use immutable update so store subscribers that compare references detect the change
+        state.enrollments = [
+          ...state.enrollments,
+          { _id: uuidv4(), user: userId, course: courseId },
+        ];
+      }
+    },
+
+    // Unenroll a user from a course
+    unenroll: (state, action) => {
+      const { userId, courseId } = action.payload;
+      state.enrollments = state.enrollments.filter(
+        (enr) => !(enr.user === userId && enr.course === courseId)
+      );
+    },
+
+    // Toggle enrollment (keeps compatibility)
     toggleEnrollment: (state, action) => {
       const { userId, courseId } = action.payload;
       const exists = state.enrollments.find(
@@ -21,14 +46,14 @@ const enrollmentSlice = createSlice({
           (enr) => !(enr.user === userId && enr.course === courseId)
         );
       } else {
-        state.enrollments.push({
-          user: userId, course: courseId,
-          _id: ""
-        });
+        state.enrollments = [
+          ...state.enrollments,
+          { _id: uuidv4(), user: userId, course: courseId },
+        ];
       }
     },
   },
 });
 
-export const { toggleEnrollment } = enrollmentSlice.actions;
+export const { enroll, unenroll, toggleEnrollment } = enrollmentSlice.actions;
 export default enrollmentSlice.reducer;

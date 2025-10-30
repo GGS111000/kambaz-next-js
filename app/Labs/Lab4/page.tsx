@@ -13,7 +13,7 @@ import ArrayStateVariable from "./ArrayStateVariable";
 import ParentStateComponent from "./ParentStateComponent";
 import ReduxExamples from "./ReduxExamples/page";
 //import store from "../store";
-import store from "../store/page"; // ✅ 明确指定路径
+import store from "../store"; // use the non-route module store under app/Labs/store
 
 import { Provider } from "react-redux";
 import HelloRedux from "./ReduxExamples/HelloRedux/page";
