@@ -3,7 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import accountReducer from "./Account/reducer";
 import coursesReducer from "./Courses/reducer";
 import modulesReducer from "./Courses/Modules/reducer";
-import assignmentsReducer from "./Courses/Assignments/reducer";
+import assignmentsReducer from "./Courses/[cid]/Assignments/reducer";
 
 export const store = configureStore({
   reducer: {
