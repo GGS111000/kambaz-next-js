@@ -3,7 +3,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
 import {
-  Row,
   Col,
   Card,
   CardImg,
@@ -16,6 +15,7 @@ import {
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addNewCourse, deleteCourse, updateCourse } from "../Courses/reducer";
+import { toggleEnrollment } from "../Enrollments/EnrollmentReducer";
 
 type Course = {
   _id: string;
@@ -28,8 +28,22 @@ type Course = {
 };
 
 export default function Dashboard() {
-  const { courses } = useSelector((state: any) => state.coursesReducer);
   const dispatch = useDispatch();
+
+  // normalize courses selector (backwards compatible)
+  const courses: Course[] = useSelector((state: any) =>
+    state.coursesReducer?.courses ?? state.courses?.courses ?? []
+  );
+
+  // current signed-in user (compatible keys)
+  const currentUser: any = useSelector((state: any) =>
+    state.account?.currentUser ?? state.accountReducer?.currentUser ?? null
+  );
+
+  // enrollments array from redux (compatible keys)
+  const allEnrollments: any[] = useSelector((state: any) =>
+    state.enrollment?.enrollments ?? state.enrollmentReducer?.enrollments ?? []
+  );
 
   // 现有的“新增/编辑”表单状态（保持你的原样）
   const [course, setCourse] = useState<any>({
@@ -42,33 +56,33 @@ export default function Dashboard() {
     description: "New Description",
   });
 
-  // ✅ 新增：本地“已注册”状态（不持久化，刷新即丢）
-  // 结构：{ [courseId]: true }
-  const [enrolled, setEnrolled] = useState<Record<string, boolean>>({});
-
-  // ✅ 新增：是否仅查看“我的 Enrollments”
+  // ✅ 仅查看“我的 Enrollments”切换
   const [showMyEnrollments, setShowMyEnrollments] = useState(false);
 
-  // ✅ 过滤出要显示的课程列表
-  const visibleCourses: Course[] = useMemo(() => {
-    if (!showMyEnrollments) return courses;
-    return (courses as Course[]).filter((c) => enrolled[c._id]);
-  }, [courses, showMyEnrollments, enrolled]);
+  // compute set of courseIds the currentUser is enrolled in
+  const enrolledIds = useMemo(() => {
+    if (!currentUser) return new Set<string>();
+    return new Set(allEnrollments.filter((e: any) => e.user === currentUser._id).map((e: any) => e.course));
+  }, [allEnrollments, currentUser]);
 
-  // ✅ 切换某门课的 Enroll/Unenroll（仅更新本地状态）
-  const toggleEnroll = (courseId: string) => {
-    setEnrolled((prev) => {
-      const next = { ...prev };
-      if (next[courseId]) delete next[courseId];
-      else next[courseId] = true;
-      return next;
-    });
+  // visible list depends on toggle
+  const visibleCourses: Course[] = useMemo(() => {
+    if (!showMyEnrollments) return courses as Course[];
+    return (courses as Course[]).filter((c) => enrolledIds.has(c._id));
+  }, [courses, showMyEnrollments, enrolledIds]);
+
+  // toggle enroll action — requires sign-in
+  const toggleEnrollHandler = (courseId: string) => {
+    if (!currentUser) {
+      // simple UX: ask to sign in first
+      // You could route to sign-in page instead
+      alert("Please sign in to enroll");
+      return;
+    }
+    dispatch(toggleEnrollment({ userId: currentUser._id, courseId }));
   };
 
-  const myCount = useMemo(
-    () => (courses as Course[]).reduce((acc, c) => acc + (enrolled[c._id] ? 1 : 0), 0),
-    [courses, enrolled]
-  );
+  const myCount = enrolledIds.size;
 
   return (
     <div id="wd-dashboard">
@@ -144,7 +158,7 @@ export default function Dashboard() {
       <div className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4" id="wd-dashboard-courses">
           {visibleCourses.map((c: Course) => {
-            const isEnrolled = !!enrolled[c._id];
+          const isEnrolled = enrolledIds.has(c._id);
             return (
               <Col key={c._id} className="wd-dashboard-course" style={{ width: "300px" }}>
                 <Card>
@@ -172,7 +186,7 @@ export default function Dashboard() {
                         className={`btn ${isEnrolled ? "btn-outline-success" : "btn-success"} ms-2`}
                         onClick={(event) => {
                           event.preventDefault(); // 关键：别触发外层 Link 跳转
-                          toggleEnroll(c._id);
+                          toggleEnrollHandler(c._id);
                         }}
                         title={isEnrolled ? "Unenroll" : "Enroll"}
                       >

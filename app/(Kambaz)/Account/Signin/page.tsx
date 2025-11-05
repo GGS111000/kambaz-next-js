@@ -20,7 +20,7 @@
 
 "use client";
 import Link from "next/link";
-import { redirect } from "next/dist/client/components/navigation";
+import { useRouter } from "next/navigation";
 import { setCurrentUser } from "../reducer";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
@@ -30,6 +30,7 @@ import { FormControl, Button } from "react-bootstrap";
 export default function Signin() {
   const [credentials, setCredentials] = useState<any>({});
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const signin = () => {
     const user = db.users.find(
@@ -38,27 +39,27 @@ export default function Signin() {
     );
     if (!user) return;
     dispatch(setCurrentUser(user));
-    redirect("/Dashboard");
+    router.push("/Dashboard");
   };
 
   return (
     <div id="wd-signin-screen">
       <h1>Sign in</h1>
-      <FormControl
-        defaultValue={credentials.username}
-        onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
-        className="mb-2"
-        placeholder="username"
-        id="wd-username"
-      />
-      <FormControl
-        defaultValue={credentials.password}
-        onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
-        className="mb-2"
-        placeholder="password"
-        type="password"
-        id="wd-password"
-      />
+          <FormControl
+            value={credentials.username || ""}
+            onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+            className="mb-2"
+            placeholder="username"
+            id="wd-username"
+          />
+          <FormControl
+            value={credentials.password || ""}
+            onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+            className="mb-2"
+            placeholder="password"
+            type="password"
+            id="wd-password"
+          />
       <Button onClick={signin} id="wd-signin-btn" className="w-100">
         Sign in
       </Button>
