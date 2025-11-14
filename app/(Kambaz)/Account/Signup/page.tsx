@@ -1,42 +1,47 @@
-import Link from "next/link";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
+
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { redirect } from "next/navigation";
 import { FormControl } from "react-bootstrap";
+import Link from "next/link";
+
+import * as client from "../client";
+import { setCurrentUser } from "../reducer";
 
 export default function Signup() {
+  const [user, setUser] = useState<any>({});
+  const dispatch = useDispatch();
+
+  const signup = async () => {
+    const newUser = await client.signup(user);
+    dispatch(setCurrentUser(newUser));
+    redirect("/Account/Profile");
+  };
+
   return (
-    <div id="wd-signup-screen">
-      <h1>Signup</h1>
+    <div className="container mt-3">
+      <h1>Sign up</h1>
 
       <FormControl
-        id="wd-username"
         placeholder="username"
         className="mb-2"
-      /><br />
+        onChange={(e) => setUser({ ...user, username: e.target.value })}
+      />
 
       <FormControl
-        id="wd-password"
         placeholder="password"
         type="password"
         className="mb-2"
-      /><br />
+        onChange={(e) => setUser({ ...user, password: e.target.value })}
+      />
 
-      <FormControl
-        id="wd-email"
-        placeholder="email"
-        type="email"
-        className="mb-2"
-      /><br />
+      <button className="btn btn-primary w-100 mb-2" onClick={signup}>
+        Create account
+      </button>
 
-      <Link
-        id="wd-signup-btn"
-        href="/Account/Profile"
-        className="btn btn-primary w-100 mb-2"   
-      >
-        Signup
-      </Link><br />
-
-      <Link id="wd-signin-link" href="/Account/Signin">
-        Signin
-      </Link>
+      <Link href="/Account/Signin">Already have an account?</Link>
     </div>
   );
 }
