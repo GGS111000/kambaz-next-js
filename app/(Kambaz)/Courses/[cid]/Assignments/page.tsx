@@ -1,72 +1,83 @@
-"use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useSelector, useDispatch } from "react-redux";
-import { useParams } from "next/navigation";
-import { Button } from "react-bootstrap";
-import { addAssignment, deleteAssignment, editAssignment, updateAssignment } from "./reducer";
-import { FaTrash, FaEdit } from "react-icons/fa";
+"use client";
+
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams, useRouter } from "next/navigation";
+import { ListGroup, Button } from "react-bootstrap";
+
+import * as client from "./client";
+import { RootState } from "../../../store";
+
+import {
+  setAssignments,
+  deleteAssignmentLocal,
+} from "./reducer";
 
 export default function AssignmentsPage() {
-  const { cid } = useParams<{ cid: string }>();
   const dispatch = useDispatch();
+  const router = useRouter();
+  const params = useParams();
+  const cid = params?.cid as string;
 
-  const assignments = useSelector((state: any) =>
-    state.assignmentsReducer?.assignments ?? state.assignments?.assignments ?? []
-  ).filter((a: any) => String(a.course) === String(cid));
+  const { assignments } = useSelector(
+    (state: RootState) => state.assignmentsReducer
+  );
 
-  const handleAdd = () => {
-    const title = prompt("Enter assignment title:");
-    if (title) {
-      dispatch(addAssignment({ title, course: cid }));
-    }
+  const fetchAssignments = async () => {
+    const data = await client.findAssignmentsForCourse(cid);
+    dispatch(setAssignments(data));
+  };
+
+  useEffect(() => {
+    fetchAssignments();
+  }, [cid]);
+
+  const onDelete = async (id: string) => {
+    await client.deleteAssignment(id);
+    dispatch(deleteAssignmentLocal(id));
   };
 
   return (
-    <div className="p-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>Assignments</h3>
-        <Button variant="danger" onClick={handleAdd}>
-          + Add Assignment
-        </Button>
-      </div>
+    <div className="container mt-3">
+      <h3>Assignments</h3>
 
-      {assignments.map((a: any) => (
-        <div
-          key={a._id}
-          className="p-3 border rounded mb-2 bg-light d-flex justify-content-between align-items-center"
-        >
-          {a.editing ? (
-            <input
-              className="form-control w-50"
-              defaultValue={a.title}
-              onChange={(e) =>
-                dispatch(updateAssignment({ ...a, title: e.target.value }))
-              }
-              onBlur={() =>
-                dispatch(updateAssignment({ ...a, editing: false }))
-              }
-              autoFocus
-            />
-          ) : (
-            <span className="fw-semibold">{a.title}</span>
-          )}
+      <Button
+        className="mb-3"
+        onClick={() => router.push(`/Courses/${cid}/Assignments/new`)}
+      >
+        Add Assignment
+      </Button>
 
-          <div className="d-flex gap-2">
-            <Button
-              variant="outline-secondary"
-              onClick={() => dispatch(editAssignment(a._id))}
-            >
-              <FaEdit />
-            </Button>
-            <Button
-              variant="outline-danger"
-              onClick={() => dispatch(deleteAssignment(a._id))}
-            >
-              <FaTrash />
-            </Button>
-          </div>
-        </div>
-      ))}
+      <ListGroup>
+        {assignments.map((a: any) => (
+          <ListGroup.Item key={a._id}>
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="fw-bold">{a.title}</div>
+
+              <div>
+                <Button
+                  className="me-2"
+                  size="sm"
+                  onClick={() =>
+                    router.push(`/Courses/${cid}/Assignments/${a._id}`)
+                  }
+                >
+                  Edit
+                </Button>
+
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={() => onDelete(a._id)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
     </div>
   );
 }
