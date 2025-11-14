@@ -1,45 +1,44 @@
-// app/(Kambaz)/Courses/[cid]/Modules/reducer.ts
-"use client";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { v4 as uuidv4 } from "uuid";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createSlice } from "@reduxjs/toolkit";
 
-export type Module = {
-  _id: string;
-  name: string;
-  course: string;
-  editing?: boolean;
+const initialState = {
+  modules: [],
 };
-
-const initialState: { modules: Module[] } = { modules: [] }; // ← 不从 Database 导入
 
 const modulesSlice = createSlice({
   name: "modules",
   initialState,
   reducers: {
-    addModule: (state, { payload }: PayloadAction<{ name: string; course: string }>) => {
-      state.modules.push({
-        _id: uuidv4(),
-        name: payload.name,
-        course: payload.course,
-      });
+    setModules: (state, action) => {
+      state.modules = action.payload;
     },
-    deleteModule: (state, { payload }: PayloadAction<string>) => {
-      state.modules = state.modules.filter((m) => m._id !== payload);
+    addModule: (state, action) => {
+      state.modules = [...state.modules, action.payload];
     },
-    editModule: (state, { payload }: PayloadAction<string>) => {
-      state.modules = state.modules.map((m) =>
-        m._id === payload ? { ...m, editing: true } : { ...m, editing: false }
+    deleteModule: (state, action) => {
+      state.modules = state.modules.filter(
+        (m: any) => m._id !== action.payload
       );
     },
-    updateModule: (state, { payload }: PayloadAction<Module>) => {
-      state.modules = state.modules.map((m) =>
-        m._id === payload._id ? { ...payload, editing: false } : m
+    updateModule: (state, action) => {
+      state.modules = state.modules.map((m: any) =>
+        m._id === action.payload._id ? action.payload : m
+      );
+    },
+    editModule: (state, action) => {
+      state.modules = state.modules.map((m: any) =>
+        m._id === action.payload ? { ...m, editing: true } : m
       );
     },
   },
 });
 
-export const { addModule, deleteModule, editModule, updateModule } =
-  modulesSlice.actions;
+export const {
+  setModules,
+  addModule,
+  deleteModule,
+  updateModule,
+  editModule,
+} = modulesSlice.actions;
 
 export default modulesSlice.reducer;

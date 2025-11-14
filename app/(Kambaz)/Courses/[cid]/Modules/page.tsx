@@ -1,81 +1,121 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { FormControl, Button } from "react-bootstrap";
-import { BsGripVertical } from "react-icons/bs";
+import { RootState } from "../../../store";
+import * as client from "../../client";
+
 import {
-  addModule,
-  deleteModule,
+  setModules,
   editModule,
-  updateModule,
+  updateModule as updateModuleState,
+  deleteModule as deleteModuleState,
 } from "./reducer";
-import ModuleControlButtons from "./ModuleControlButtons";
 
-export default function ModulesPage() {
-  const { cid } = useParams<{ cid: string }>();
+export default function Modules() {
+  const { cid } = useParams();
   const dispatch = useDispatch();
-
-  // 从 Redux 中读取所有模块
-  const modules = useSelector((state: any) =>
-    state.modulesReducer?.modules ?? state.modules?.modules ?? []
-  );
- console.log("Current modules:", modules);
-  // 过滤当前课程的模块
-  const courseModules = modules.filter(
-    (m: any) => String(m.course) === String(cid)
+  const { modules } = useSelector(
+    (state: RootState) => state.modulesReducer
   );
 
-  // 添加模块输入框状态
-  const handleAdd = () => {
-    const name = prompt("Enter module name:");
-    if (name) {
-      dispatch(addModule({ name, course: cid }));
-    }
+  const [moduleName, setModuleName] = useState("");
+
+  const fetchModules = async () => {
+    const data = await client.findModulesForCourse(cid as string);
+    dispatch(setModules(data));
+  };
+
+  useEffect(() => {
+    fetchModules();
+  }, [cid]);
+
+  const onCreateModule = async () => {
+    const newModule = {
+      name: moduleName,
+      course: cid,
+    };
+    const module = await client.createModuleForCourse(
+      cid as string,
+      newModule
+    );
+    dispatch(setModules([...modules, module]));
+    setModuleName("");
+  };
+
+  const onRemoveModule = async (moduleId: string) => {
+    await client.deleteModule(moduleId);
+    dispatch(setModules(modules.filter((m: any) => m._id !== moduleId)));
+  };
+
+  const onUpdateModule = async (module: any) => {
+    await client.updateModule(module);
+    dispatch(
+      setModules(
+        modules.map((m: any) => (m._id === module._id ? module : m))
+      )
+    );
   };
 
   return (
-    <div id="wd-modules" className="p-3">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h3>Modules</h3>
-        <Button variant="danger" onClick={handleAdd}>
-          + Add Module
-        </Button>
-      </div>
+    <div className="container mt-3">
+      <h3>Modules</h3>
 
-      {courseModules.map((module: any) => (
-        <div
-          key={module._id}
-          className="wd-title p-3 ps-2 bg-secondary text-white mb-2 rounded"
-        >
-          <BsGripVertical className="me-2 fs-4" />
-          {module.editing ? (
-            <FormControl
-              className="d-inline-block w-50"
-              autoFocus
-              defaultValue={module.name}
-              onChange={(e) =>
-                dispatch(updateModule({ ...module, name: e.target.value }))
-              }
-              onBlur={() =>
-                dispatch(updateModule({ ...module, editing: false }))
-              }
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                dispatch(updateModule({ ...module, editing: false }))
-              }
-            />
-          ) : (
-            <span>{module.name}</span>
-          )}
+      <input
+        value={moduleName}
+        onChange={(e) => setModuleName(e.target.value)}
+        placeholder="New module name"
+        className="form-control mb-2"
+      />
 
-          <ModuleControlButtons
-            moduleId={module._id}
-            deleteModule={(id) => dispatch(deleteModule(id))}
-            editModule={(id) => dispatch(editModule(id))}
-          />
-        </div>
-      ))}
+      <button className="btn btn-primary mb-3" onClick={onCreateModule}>
+        Add Module
+      </button>
+
+      <ul className="list-group">
+        {modules.map((module: any) => (
+          <li key={module._id} className="list-group-item">
+            {!module.editing && (
+              <>
+                {module.name}
+                <button
+                  className="btn btn-sm btn-warning float-end ms-2"
+                  onClick={() => dispatch(editModule(module._id))}
+                >
+                  Edit
+                </button>
+                <button
+                  className="btn btn-sm btn-danger float-end"
+                  onClick={() => onRemoveModule(module._id)}
+                >
+                  Delete
+                </button>
+              </>
+            )}
+
+            {module.editing && (
+              <input
+                value={module.name}
+                className="form-control"
+                onChange={(e) =>
+                  dispatch(
+                    updateModuleState({
+                      ...module,
+                      name: e.target.value,
+                    })
+                  )
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    onUpdateModule({ ...module, editing: false });
+                  }
+                }}
+              />
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
