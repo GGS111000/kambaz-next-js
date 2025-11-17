@@ -11,7 +11,7 @@ import { RootState } from "../../../../store";
 
 import {
   addAssignment,
-  updateAssignmentLocal,
+  updateAssignment,
 } from "../reducer";
 
 export default function AssignmentEditor() {
@@ -47,7 +47,7 @@ export default function AssignmentEditor() {
       dispatch(addAssignment(created));
     } else {
       const updated = await client.updateAssignment(assignment);
-      dispatch(updateAssignmentLocal(updated));
+      dispatch(updateAssignment(updated));
     }
 
     router.push(`/Courses/${cid}/Assignments`);

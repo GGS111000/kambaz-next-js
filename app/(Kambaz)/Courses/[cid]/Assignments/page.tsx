@@ -11,7 +11,7 @@ import { RootState } from "../../../store";
 
 import {
   setAssignments,
-  deleteAssignmentLocal,
+  deleteAssignment,
 } from "./reducer";
 
 export default function AssignmentsPage() {
@@ -35,7 +35,7 @@ export default function AssignmentsPage() {
 
   const onDelete = async (id: string) => {
     await client.deleteAssignment(id);
-    dispatch(deleteAssignmentLocal(id));
+    dispatch(deleteAssignment(id));
   };
 
   return (
