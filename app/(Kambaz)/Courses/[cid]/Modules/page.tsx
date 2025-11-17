@@ -11,7 +11,7 @@ import {
   setModules,
   addModule,
   deleteModule as deleteModuleLocal,
-  updateModuleLocal,
+  updateModule,
   editModule,
 } from "./../Modules/reducer";
 import * as coursesClient from "../../client";
@@ -55,7 +55,7 @@ export default function ModulesPage() {
 
   const onUpdateModule = async (module: any) => {
     await coursesClient.updateModule(module);
-    dispatch(updateModuleLocal({ ...module, editing: false }));
+    dispatch(updateModule({ ...module, editing: false }));
   };
 
   return (
@@ -88,7 +88,7 @@ export default function ModulesPage() {
                   value={module.name}
                   onChange={(e) =>
                     dispatch(
-                      updateModuleLocal({
+                      updateModule({
                         ...module,
                         name: e.target.value,
                       })
