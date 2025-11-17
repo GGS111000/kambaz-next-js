@@ -3,8 +3,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import accountReducer from "./Account/reducer";
 import coursesReducer from "./Courses/reducer";
-import modulesReducer from "./Courses/Modules/reducer";
+import modulesReducer from "./Courses/[cid]/Modules/reducer";
 import assignmentsReducer from "./Courses/[cid]/Assignments/reducer";
+//import enrollmentsReducer from "./Dashboard/EnrollmentReducer";   // ★ 新增
+import enrollmentsReducer from "./Enrollments/EnrollmentReducer";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +14,7 @@ export const store = configureStore({
     coursesReducer,
     modulesReducer,
     assignmentsReducer,
+    enrollmentsReducer,   // ★ 新增
   },
 });
 

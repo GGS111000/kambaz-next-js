@@ -1,97 +1,209 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "../store";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Link from "next/link";
 
-import * as client from "../Courses/client";
-import { setCourses } from "../Courses/reducer";
+import { RootState } from "../store";
+import { Card, Row, Col, Button, FormControl } from "react-bootstrap";
+import { v4 as uuidv4 } from "uuid";
+
+import * as db from "../Database";
+import coursesData from "../Database/courses.json";
+
+import {
+  setCourses,
+  updateCourse as updateReduxCourse,
+} from "../Courses/reducer";
+
+import {
+  enroll,
+  unenroll,
+} from "../Enrollments/EnrollmentReducer";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
+
+  /** Redux State */
+  const { courses } = useSelector((state: RootState) => state.coursesReducer);
+  const { enrollments } = useSelector(
+    (state: RootState) => state.enrollmentsReducer
+  );
   const { currentUser } = useSelector(
     (state: RootState) => state.accountReducer
   );
-  const { courses } = useSelector(
-    (state: RootState) => state.coursesReducer
-  );
 
-  const [course, setCourse] = useState<any>({ name: "" });
+  /** Use ONLY the first 5 courses from Database */
+  const initialCourses = coursesData.slice(0, 5);
 
-  const fetchCourses = async () => {
-    try {
-      const data = await client.findMyCourses();
-      dispatch(setCourses(data));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  /** State for editing/creating course */
+  const [course, setCourse] = useState<any>({
+    _id: "0",
+    name: "New Course",
+    number: "NEW001",
+    startDate: "2023-01-10",
+    endDate: "2023-05-15",
+    description: "New Description",
+    image: "/images/reactjs.jpg",
+  });
 
+  /** Initialize courses in Redux if not loaded */
   useEffect(() => {
-    if (currentUser) fetchCourses();
-  }, [currentUser]);
+    if (!courses || courses.length === 0) {
+      dispatch(setCourses(initialCourses));
+    }
+  }, []);
 
-  const onAddCourse = async () => {
-    const newCourse = await client.createCourse(course);
+  /** Add Course */
+  const onAddNewCourse = () => {
+    const newCourse = { ...course, _id: uuidv4() };
     dispatch(setCourses([...courses, newCourse]));
+    alert("Course added.");
   };
 
-  const onDeleteCourse = async (courseId: string) => {
-    await client.deleteCourse(courseId);
-    dispatch(setCourses(courses.filter((c) => c._id !== courseId)));
+  /** Delete */
+  const onDeleteCourse = (courseId: string) => {
+    const updated = courses.filter((c) => c._id !== courseId);
+    dispatch(setCourses(updated));
+    alert("Course deleted.");
   };
 
-  const onUpdateCourse = async (updated: any) => {
-    await client.updateCourse(updated);
+  /** Update */
+  const onUpdateCourse = () => {
     dispatch(
       setCourses(
-        courses.map((c) => (c._id === updated._id ? updated : c))
+        courses.map((c) => (c._id === course._id ? course : c))
       )
+    );
+    alert("Course updated.");
+  };
+
+  /** Enroll */
+  const onEnroll = (courseId: string) => {
+    if (!currentUser) return alert("Please sign in first.");
+    dispatch(enroll({ userId: currentUser._id, courseId }));
+  };
+
+  /** Unenroll */
+  const onUnenroll = (courseId: string) => {
+    if (!currentUser) return alert("Please sign in first.");
+    dispatch(unenroll({ userId: currentUser._id, courseId }));
+  };
+
+  /** Check if current user enrolled this course */
+  const isEnrolled = (courseId: string) => {
+    if (!currentUser) return false;
+    return enrollments.some(
+      (e) => e.user === currentUser._id && e.course === courseId
     );
   };
 
   return (
-    <div className="container mt-3">
-      <h2>Dashboard</h2>
+    <div className="p-4" id="wd-dashboard">
+      <h1>Dashboard</h1>
+      <hr />
 
-      <input
-        placeholder="New course name"
-        className="form-control mb-2"
+      {/* FORM - Add / Edit / Update */}
+      <h5>
+        Manage Course
+        <button
+          className="btn btn-primary float-end"
+          onClick={onAddNewCourse}
+        >
+          Add
+        </button>
+        <button
+          className="btn btn-warning float-end me-2"
+          onClick={onUpdateCourse}
+        >
+          Update
+        </button>
+      </h5>
+
+      <FormControl
+        className="mb-2"
+        value={course.name}
+        placeholder="Course Name"
         onChange={(e) =>
           setCourse({ ...course, name: e.target.value })
         }
       />
 
-      <button className="btn btn-primary mb-3" onClick={onAddCourse}>
-        Add Course
-      </button>
+      <FormControl
+        className="mb-2"
+        as="textarea"
+        rows={3}
+        value={course.description}
+        placeholder="Description"
+        onChange={(e) =>
+          setCourse({ ...course, description: e.target.value })
+        }
+      />
 
-      <ul className="list-group">
-        {courses.map((c) => (
-          <li key={c._id} className="list-group-item d-flex justify-content-between">
-            <span>{c.name}</span>
+      <hr />
 
-            <div>
-              <button
-                className="btn btn-danger btn-sm me-2"
-                onClick={() => onDeleteCourse(c._id)}
+      {/* ALL COURSES DISPLAY */}
+      <Row xs={1} md={5} className="g-4">
+        {courses.map((course) => (
+          <Col key={course._id} style={{ width: "300px" }}>
+            <Card>
+              <Link
+                href={`/Courses/${course._id}/Home`}
+                className="text-decoration-none text-dark"
               >
-                Delete
-              </button>
+                <Card.Img
+                  src={course.image || "/images/reactjs.jpg"}
+                  height={160}
+                />
+                <Card.Body>
+                  <Card.Title className="text-nowrap overflow-hidden">
+                    {course.name}
+                  </Card.Title>
+                  <Card.Text
+                    className="overflow-hidden"
+                    style={{ height: "100px" }}
+                  >
+                    {course.description}
+                  </Card.Text>
+                </Card.Body>
+              </Link>
 
-              <button
-                className="btn btn-secondary btn-sm"
-                onClick={() =>
-                  onUpdateCourse({ ...c, name: c.name + "!" })
-                }
-              >
-                Update
-              </button>
-            </div>
-          </li>
+              <div className="p-2 d-flex justify-content-between">
+
+  <Button
+    variant="primary"
+    onClick={() => window.location.href = `/Courses/${course._id}/Home`}
+  >
+    Go
+  </Button>
+
+  {!isEnrolled(course._id) ? (
+    <Button variant="success" onClick={() => onEnroll(course._id)}>
+      Enroll
+    </Button>
+  ) : (
+    <Button variant="dark" onClick={() => onUnenroll(course._id)}>
+      Unenroll
+    </Button>
+  )}
+
+  <Button variant="secondary" onClick={() => setCourse(course)}>
+    Edit
+  </Button>
+
+  <Button
+    variant="danger"
+    onClick={() => onDeleteCourse(course._id)}
+  >
+    Delete
+  </Button>
+</div>
+
+            </Card>
+          </Col>
         ))}
-      </ul>
+      </Row>
     </div>
   );
 }

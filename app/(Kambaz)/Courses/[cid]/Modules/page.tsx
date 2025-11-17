@@ -13,7 +13,7 @@ import {
   deleteModule as deleteModuleLocal,
   updateModuleLocal,
   editModule,
-} from "../../Modules/reducer";
+} from "./../Modules/reducer";
 import * as coursesClient from "../../client";
 
 export default function ModulesPage() {
