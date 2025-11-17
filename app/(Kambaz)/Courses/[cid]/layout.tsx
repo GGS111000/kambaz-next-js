@@ -1,12 +1,29 @@
 "use client";
-import { ReactNode } from "react";
-import CourseNavigation from "./Navigation";
 
-export default function CoursesLayout({ children }: { children: ReactNode }) {
+import Navigation from "./Navigation";
+import Breadcrumb from "./Breadcrumb";
+
+export default function CourseLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="d-flex">
-      <CourseNavigation />           {/* 左2：课程导航 */}
-      <div className="flex-fill p-4">{children}</div> {/* 主内容 */}
+    <div className="container-fluid mt-2">
+      <Breadcrumb />
+
+      <div className="row mt-2">
+        {/* 第二列：红色课程菜单 */}
+        <div
+          className="col-2 pt-2"
+          style={{ borderRight: "1px solid #ddd", minHeight: "100vh" }}
+        >
+          <Navigation />
+        </div>
+
+        {/* 第三列：课程内容区域 */}
+        <div className="col-10 pt-2">{children}</div>
+      </div>
     </div>
   );
 }
