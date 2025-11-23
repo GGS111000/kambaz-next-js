@@ -12,19 +12,20 @@ export default function KambazLayout({
   return (
     <Provider store={store}>
       <div className="container-fluid">
-        <div className="row">
+        <div className="row gx-0">
 
-          {/* 左黑侧栏 Navigation */}
+          {/* 左侧黑导航栏 */}
           <div
             className="col-1 p-0"
             style={{ backgroundColor: "black", minHeight: "100vh" }}
-            suppressHydrationWarning
           >
             <KambazNavigation />
           </div>
 
           {/* 主内容 */}
-          <div className="col-11 p-4">{children}</div>
+          <div className="col-11 p-4">
+            {children}
+          </div>
 
         </div>
       </div>

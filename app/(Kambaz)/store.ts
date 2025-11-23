@@ -5,7 +5,6 @@ import accountReducer from "./Account/reducer";
 import coursesReducer from "./Courses/reducer";
 import modulesReducer from "./Courses/[cid]/Modules/reducer";
 import assignmentsReducer from "./Courses/[cid]/Assignments/reducer";
-//import enrollmentsReducer from "./Dashboard/EnrollmentReducer";   // ★ 新增
 import enrollmentsReducer from "./Enrollments/EnrollmentReducer";
 
 export const store = configureStore({
