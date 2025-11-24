@@ -17,35 +17,57 @@ export const fetchAllCourses = async () => {
   return data;
 };
 
+/** 获取所有课程（Dashboard 用） */
+export const findAllCourses = async () => {
+  const response = await axiosWithCredentials.get(COURSES_API);
+  return response.data;
+};
+
 // 课程 —— 当前用户的课程列表
 export const findMyCourses = async () => {
-  const { data } = await axiosWithCredentials.get(
+  const response = await axiosWithCredentials.get(
     `${USERS_API}/current/courses`
   );
-  return data;
+  return response.data;
 };
 
 // 课程 —— 创建课程，并自动把当前用户 enroll 进去
 export const createCourse = async (course: any) => {
-  const { data } = await axiosWithCredentials.post(
-    `${USERS_API}/current/courses`,
-    course
-  );
-  return data;
+  const response = await axiosWithCredentials.post(COURSES_API, course);
+  return response.data;
 };
 
 // 课程 —— 删除
 export const deleteCourse = async (courseId: string) => {
-  const { data } = await axios.delete(`${COURSES_API}/${courseId}`);
-  return data;
+  const response = await axiosWithCredentials.delete(
+    `${COURSES_API}/${courseId}`
+  );
+  return response.data;
 };
 
 // 课程 —— 更新
 export const updateCourse = async (course: any) => {
-  const { data } = await axios.put(`${COURSES_API}/${course._id}`, course);
-  return data;
+  const response = await axiosWithCredentials.put(
+    `${COURSES_API}/${course._id}`,
+    course
+  );
+  return response.data;
+};
+/** ENROLL：注册课程 */
+export const enrollIntoCourse = async (userId: string, courseId: string) => {
+  const response = await axiosWithCredentials.post(
+    `${USERS_API}/${userId}/courses/${courseId}`
+  );
+  return response.data;
 };
 
+/** UNENROLL：取消注册课程 */
+export const unenrollFromCourse = async (userId: string, courseId: string) => {
+  const response = await axiosWithCredentials.delete(
+    `${USERS_API}/${userId}/courses/${courseId}`
+  );
+  return response.data;
+};
 /* ---------- Modules ---------- */
 
 // 某门课程的所有模块
@@ -69,16 +91,18 @@ export const createModuleForCourse = async (
 };
 
 // 删除模块
-export const deleteModule = async (moduleId: string) => {
-  const { data } = await axios.delete(`${MODULES_API}/${moduleId}`);
-  return data;
+export const deleteModule = async (courseId: string, moduleId: string) => {
+  const response = await axios.delete(
+    `${COURSES_API}/${courseId}/modules/${moduleId}`
+  );
+  return response.data;
 };
 
 // 更新模块
-export const updateModule = async (module: any) => {
+export const updateModule = async (courseId: string, module: any) => {
   const { data } = await axios.put(
-    `${MODULES_API}/${module._id}`,
-    module
+    `${COURSES_API}/${courseId}/modules/${module._id}`
+    , module
   );
   return data;
 };
@@ -93,13 +117,6 @@ export const enrollInCourse = async (courseId: string) => {
   return data;
 };
 
-export const unenrollFromCourse = async (courseId: string) => {
-  const { data } = await axiosWithCredentials.post(
-    `${COURSES_API}/${courseId}/unenroll`,
-    {}
-  );
-  return data;
-};
 
 export const myEnrollments = async () => {
   const { data } = await axiosWithCredentials.get(

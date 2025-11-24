@@ -49,12 +49,12 @@ export default function ModulesPage() {
   };
 
   const onRemoveModule = async (moduleId: string) => {
-    await coursesClient.deleteModule(moduleId);
+    await coursesClient.deleteModule(cid, moduleId);
     dispatch(deleteModuleLocal(moduleId));
   };
 
   const onUpdateModule = async (module: any) => {
-    await coursesClient.updateModule(module);
+    await coursesClient.updateModule(cid, module);
     dispatch(updateModule({ ...module, editing: false }));
   };
 
