@@ -7,24 +7,21 @@ import Link from "next/link";
 
 import { RootState } from "../store";
 import { Card, Row, Col, Button, FormControl } from "react-bootstrap";
-import { v4 as uuidv4 } from "uuid";
 
-import * as client from "../Courses/client";  // <<--- 新增：使用 server API
-import {
-  setCourses,
-  updateCourse as updateReduxCourse,
-} from "../Courses/reducer";
+import * as client from "../Courses/client";
+import { setCourses } from "../Courses/reducer";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
 
-  /** Redux State */
+  /** Redux 里的课程列表 */
   const { courses } = useSelector((state: RootState) => state.coursesReducer);
+  /** 当前登录用户 */
   const { currentUser } = useSelector(
     (state: RootState) => state.accountReducer
   );
 
-  /** Local State for creating/updating course */
+  /** 当前正在编辑/新建的课程 */
   const [course, setCourse] = useState<any>({
     _id: "0",
     name: "New Course",
@@ -33,68 +30,126 @@ export default function Dashboard() {
     image: "/images/reactjs.jpg",
   });
 
-  /** Load courses from DATABASE (MongoDB) */
+  /** 当前用户已经 enroll 的课程 ID 列表 */
+  const [enrolledIds, setEnrolledIds] = useState<string[]>([]);
+
+  /** 从数据库加载所有课程（只要 name + description 即可） */
   const fetchCourses = async () => {
-    const cs = await client.findAllCourses();
-    dispatch(setCourses(cs));
+    try {
+      const cs = await client.findAllCourses();
+      dispatch(setCourses(cs));
+    } catch (e) {
+      console.error("fetchCourses failed", e);
+    }
   };
 
+  /** 从数据库加载“当前用户已经选了哪些课” */
+  const fetchEnrolledCourses = async () => {
+    if (!currentUser) {
+      setEnrolledIds([]);
+      return;
+    }
+    try {
+      const myCourses = await client.findMyCourses(); // GET /api/users/current/courses
+      const ids = myCourses.map((c: any) => c._id);
+      setEnrolledIds(ids);
+    } catch (e) {
+      console.error("fetchEnrolledCourses failed", e);
+    }
+  };
+
+  /** 首次挂载：加载课程列表 */
   useEffect(() => {
     fetchCourses();
   }, []);
 
-  /** Add new course */
+  /** 当前用户变化时：刷新已选课程 */
+  useEffect(() => {
+    fetchEnrolledCourses();
+  }, [currentUser]);
+
+  /** 新增课程（会在后端顺带给当前用户 enroll） */
   const onAddNewCourse = async () => {
-    const newCourse = await client.createCourse(course);
-    dispatch(setCourses([...courses, newCourse]));
-    alert("Course added.");
+    if (!currentUser) {
+      alert("Please sign in first.");
+      return;
+    }
+    try {
+      const newCourse = await client.createCourse(course);
+      dispatch(setCourses([...courses, newCourse]));
+      await fetchEnrolledCourses(); // 新建后刷新我的课程
+      alert("Course added.");
+    } catch (e) {
+      console.error("createCourse failed", e);
+      alert("Failed to add course.");
+    }
   };
 
-  /** Delete */
+  /** 删除课程（会在后端删掉所有 enrollments） */
   const onDeleteCourse = async (courseId: string) => {
-    await client.deleteCourse(courseId);
-    dispatch(setCourses(courses.filter((c) => c._id !== courseId)));
-    alert("Course deleted.");
+    try {
+      await client.deleteCourse(courseId);
+      dispatch(setCourses(courses.filter((c) => c._id !== courseId)));
+      await fetchEnrolledCourses();
+      alert("Course deleted.");
+    } catch (e) {
+      console.error("deleteCourse failed", e);
+      alert("Failed to delete course.");
+    }
   };
 
-  /** Update */
+  /** 更新课程基本信息 */
   const onUpdateCourse = async () => {
-    const updated = await client.updateCourse(course);
-    dispatch(
-      setCourses(
-        courses.map((c) => (c._id === course._id ? updated : c))
-      )
-    );
-    alert("Course updated.");
+    try {
+      const updated = await client.updateCourse(course);
+      dispatch(
+        setCourses(courses.map((c) => (c._id === course._id ? updated : c)))
+      );
+      alert("Course updated.");
+    } catch (e) {
+      console.error("updateCourse failed", e);
+      alert("Failed to update course.");
+    }
   };
 
-  /** ENROLL --- NOW USING SERVER API */
+  /** ENROLL：调用后端 API + 刷新本地 enrolledIds */
   const onEnroll = async (courseId: string) => {
-    if (!currentUser) return alert("Please sign in first.");
-
-    await client.enrollIntoCourse(currentUser._id, courseId);
-
-    alert("Enrolled!");
-
-    fetchCourses(); // reload courses
+    if (!currentUser) {
+      alert("Please sign in first.");
+      return;
+    }
+    try {
+      await client.enrollIntoCourse(currentUser._id, courseId);
+      await fetchEnrolledCourses(); // 重新拉一次「我选了哪些课」
+      alert("Enrolled!");
+    } catch (e) {
+      console.error("enrollIntoCourse failed", e);
+      alert("Failed to enroll.");
+    }
   };
 
-  /** UNENROLL --- NOW USING SERVER API */
+  /** UNENROLL：调用后端 API + 刷新本地 enrolledIds */
   const onUnenroll = async (courseId: string) => {
-    if (!currentUser) return alert("Please sign in first.");
-
-    await client.unenrollFromCourse(currentUser._id, courseId);
-
-    alert("Unenrolled.");
-
-    fetchCourses(); // reload courses
+    if (!currentUser) {
+      alert("Please sign in first.");
+      return;
+    }
+    try {
+      await client.unenrollFromCourse(currentUser._id, courseId);
+      await fetchEnrolledCourses();
+      alert("Unenrolled.");
+    } catch (e) {
+      console.error("unenrollFromCourse failed", e);
+      alert("Failed to unenroll.");
+    }
   };
 
-  /** CHECK ENROLLMENT FROM SERVER */
-  const isEnrolled = (course: any) => {
+  /** 判断某门课当前用户是否已选：
+   * 只看 course._id 是否出现在 enrolledIds 里
+   */
+  const isEnrolled = (courseId: string) => {
     if (!currentUser) return false;
-    if (!course?.students) return false;
-    return course.students.includes(currentUser._id);
+    return enrolledIds.includes(courseId);
   };
 
   return (
@@ -172,12 +227,18 @@ export default function Dashboard() {
                   Go
                 </Button>
 
-                {!isEnrolled(course) ? (
-                  <Button variant="success" onClick={() => onEnroll(course._id)}>
+                {!isEnrolled(course._id) ? (
+                  <Button
+                    variant="success"
+                    onClick={() => onEnroll(course._id)}
+                  >
                     Enroll
                   </Button>
                 ) : (
-                  <Button variant="dark" onClick={() => onUnenroll(course._id)}>
+                  <Button
+                    variant="dark"
+                    onClick={() => onUnenroll(course._id)}
+                  >
                     Unenroll
                   </Button>
                 )}
@@ -200,214 +261,3 @@ export default function Dashboard() {
     </div>
   );
 }
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-// "use client";
-
-// import { useState, useEffect } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import Link from "next/link";
-
-// import { RootState } from "../store";
-// import { Card, Row, Col, Button, FormControl } from "react-bootstrap";
-// import { v4 as uuidv4 } from "uuid";
-
-// import * as db from "../Database";
-// import coursesData from "../Database/courses.json";
-
-// import {
-//   setCourses,
-//   updateCourse as updateReduxCourse,
-// } from "../Courses/reducer";
-
-// import {
-//   enroll,
-//   unenroll,
-// } from "../Enrollments/EnrollmentReducer";
-// import * as client from "../Courses/client"; 
-
-
-// export default function Dashboard() {
-//   const dispatch = useDispatch();
-
-//   /** Redux State */
-//   const { courses } = useSelector((state: RootState) => state.coursesReducer);
-//   const { enrollments } = useSelector(
-//     (state: RootState) => state.enrollmentsReducer
-//   );
-//   const { currentUser } = useSelector(
-//     (state: RootState) => state.accountReducer
-//   );
-
-//   /** Use ONLY the first 5 courses from Database */
-//   const initialCourses = coursesData.slice(0, 5);
-
-//   /** State for editing/creating course */
-//   const [course, setCourse] = useState<any>({
-//     _id: "0",
-//     name: "New Course",
-//     number: "NEW001",
-//     startDate: "2023-01-10",
-//     endDate: "2023-05-15",
-//     description: "New Description",
-//     image: "/images/reactjs.jpg",
-//   });
-
-//   /** Initialize courses in Redux if not loaded */
-//   useEffect(() => {
-//     if (!courses || courses.length === 0) {
-//       dispatch(setCourses(initialCourses));
-//     }
-//   }, []);
-
-//   /** Add Course */
-//   const onAddNewCourse = () => {
-//     const newCourse = { ...course, _id: uuidv4() };
-//     dispatch(setCourses([...courses, newCourse]));
-//     alert("Course added.");
-//   };
-
-//   /** Delete */
-//   const onDeleteCourse = (courseId: string) => {
-//     const updated = courses.filter((c) => c._id !== courseId);
-//     dispatch(setCourses(updated));
-//     alert("Course deleted.");
-//   };
-
-//   /** Update */
-//   const onUpdateCourse = () => {
-//     dispatch(
-//       setCourses(
-//         courses.map((c) => (c._id === course._id ? course : c))
-//       )
-//     );
-//     alert("Course updated.");
-//   };
-
-//   /** Enroll */
-//   const onEnroll = (courseId: string) => {
-//     if (!currentUser) return alert("Please sign in first.");
-//     dispatch(enroll({ userId: currentUser._id, courseId }));
-//   };
-
-//   /** Unenroll */
-//   const onUnenroll = (courseId: string) => {
-//     if (!currentUser) return alert("Please sign in first.");
-//     dispatch(unenroll({ userId: currentUser._id, courseId }));
-//   };
-
-//   /** Check if current user enrolled this course */
-//   const isEnrolled = (courseId: string) => {
-//     if (!currentUser) return false;
-//     return enrollments.some(
-//       (e) => e.user === currentUser._id && e.course === courseId
-//     );
-//   };
-
-//   return (
-//     <div className="p-4" id="wd-dashboard">
-//       <h1>Dashboard</h1>
-//       <hr />
-
-//       {/* FORM - Add / Edit / Update */}
-//       <h5>
-//         Manage Course
-//         <button
-//           className="btn btn-primary float-end"
-//           onClick={onAddNewCourse}
-//         >
-//           Add
-//         </button>
-//         <button
-//           className="btn btn-warning float-end me-2"
-//           onClick={onUpdateCourse}
-//         >
-//           Update
-//         </button>
-//       </h5>
-
-//       <FormControl
-//         className="mb-2"
-//         value={course.name}
-//         placeholder="Course Name"
-//         onChange={(e) =>
-//           setCourse({ ...course, name: e.target.value })
-//         }
-//       />
-
-//       <FormControl
-//         className="mb-2"
-//         as="textarea"
-//         rows={3}
-//         value={course.description}
-//         placeholder="Description"
-//         onChange={(e) =>
-//           setCourse({ ...course, description: e.target.value })
-//         }
-//       />
-
-//       <hr />
-
-//       {/* ALL COURSES DISPLAY */}
-//       <Row xs={1} md={5} className="g-4">
-//         {courses.map((course) => (
-//           <Col key={course._id} style={{ width: "300px" }}>
-//             <Card>
-//               <Link
-//                 href={`/Courses/${course._id}/Home`}
-//                 className="text-decoration-none text-dark"
-//               >
-//                 <Card.Img
-//                   src={course.image || "/images/reactjs.jpg"}
-//                   height={160}
-//                 />
-//                 <Card.Body>
-//                   <Card.Title className="text-nowrap overflow-hidden">
-//                     {course.name}
-//                   </Card.Title>
-//                   <Card.Text
-//                     className="overflow-hidden"
-//                     style={{ height: "100px" }}
-//                   >
-//                     {course.description}
-//                   </Card.Text>
-//                 </Card.Body>
-//               </Link>
-
-//               <div className="p-2 d-flex justify-content-between">
-
-//   <Button
-//     variant="primary"
-//     onClick={() => window.location.href = `/Courses/${course._id}/Home`}
-//   >
-//     Go
-//   </Button>
-
-//   {!isEnrolled(course._id) ? (
-//     <Button variant="success" onClick={() => onEnroll(course._id)}>
-//       Enroll
-//     </Button>
-//   ) : (
-//     <Button variant="dark" onClick={() => onUnenroll(course._id)}>
-//       Unenroll
-//     </Button>
-//   )}
-
-//   <Button variant="secondary" onClick={() => setCourse(course)}>
-//     Edit
-//   </Button>
-
-//   <Button
-//     variant="danger"
-//     onClick={() => onDeleteCourse(course._id)}
-//   >
-//     Delete
-//   </Button>
-// </div>
-
-//             </Card>
-//           </Col>
-//         ))}
-//       </Row>
-//     </div>
-//   );
-// }
