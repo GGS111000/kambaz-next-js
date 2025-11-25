@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+console.log("HTTP_SERVER = ", process.env.NEXT_PUBLIC_HTTP_SERVER);
+
 import axios from "axios";
 
 export const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
