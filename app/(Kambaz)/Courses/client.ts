@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-const axiosWithCredentials = axios.create({ withCredentials: true });
+const axiosWithCredentials = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_HTTP_SERVER,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 
 export const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
 

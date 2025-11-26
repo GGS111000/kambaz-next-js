@@ -5,8 +5,15 @@ console.log("HTTP_SERVER = ", process.env.NEXT_PUBLIC_HTTP_SERVER);
 
 
 const axiosWithCredentials = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_HTTP_SERVER,
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
+
+
+
 export const HTTP_SERVER = process.env.NEXT_PUBLIC_HTTP_SERVER;
 export const USERS_API = `${HTTP_SERVER}/api/users`;
 
