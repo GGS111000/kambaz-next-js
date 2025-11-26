@@ -18,6 +18,8 @@ const MODULES_API = `${HTTP_SERVER}/api/modules`;
 const ENROLLMENTS_API = `${HTTP_SERVER}/api/enrollments`;
 const ASSIGNMENTS_API_ROOT = `${HTTP_SERVER}/api`;
 
+
+
 // 课程 —— 所有课程（一般不用，你主要用 findMyCourses）
 export const fetchAllCourses = async () => {
   const { data } = await axios.get(COURSES_API);
@@ -75,6 +77,16 @@ export const unenrollFromCourse = async (userId: string, courseId: string) => {
   );
   return response.data;
 };
+
+export const findUsersForCourse = async (courseId: string) => {
+  const { data } = await axiosWithCredentials.get(
+    `${COURSES_API}/${courseId}/users`
+  );
+  return data;
+};
+
+
+
 /* ---------- Modules ---------- */
 
 // 某门课程的所有模块

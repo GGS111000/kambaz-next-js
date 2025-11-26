@@ -1,19 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import PeopleTable from "./Table";
-import * as client from "../../../Account/client";
+import * as client from "../../client";
 
 export default function PeoplePage() {
   const { cid } = useParams();
   const [users, setUsers] = useState<any[]>([]);
 
   const fetchUsers = async () => {
-    const all = await client.findAllUsers();
-    setUsers(all);
+    const list = await client.findUsersForCourse(cid as string);
+    setUsers(list);
   };
+
+  useEffect(() => {
+  const load = async () => {
+    if (cid) {
+      const list = await client.findUsersForCourse(cid as string);
+      setUsers(list);
+    }
+  };
+  load();
+}, [cid]);
+
 
   return (
     <div>

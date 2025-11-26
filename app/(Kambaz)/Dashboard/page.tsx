@@ -200,21 +200,31 @@ export default function Dashboard() {
 
       <FormControl
         className="mb-2"
-        value={course.title}
+        value={course.title || course.name || ""}
         placeholder="Course Name"
-        onChange={(e) => setCourse({ ...course, title: e.target.value })}
+        onChange={(e) =>
+          setCourse({
+            ...course,
+            title: e.target.value,
+            name: e.target.value, // 确保新/旧课程 title/name 同步
+          })
+        }
       />
 
       <FormControl
         className="mb-3"
         as="textarea"
         rows={3}
-        value={course.description}
+        value={course.description || ""}
         placeholder="Description"
         onChange={(e) =>
-          setCourse({ ...course, description: e.target.value })
+          setCourse({
+            ...course,
+            description: e.target.value,
+          })
         }
       />
+
 
       <hr />
 
