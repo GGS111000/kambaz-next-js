@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
-
 import { RootState } from "../store";
 import { Card, Row, Col, Button, FormControl } from "react-bootstrap";
 
@@ -16,6 +15,7 @@ export default function Dashboard() {
 
   /** Redux 里的课程列表 */
   const { courses } = useSelector((state: RootState) => state.coursesReducer);
+
   /** 当前登录用户 */
   const { currentUser } = useSelector(
     (state: RootState) => state.accountReducer
@@ -30,10 +30,13 @@ export default function Dashboard() {
     image: "/images/reactjs.jpg",
   });
 
-  /** 当前用户已经 enroll 的课程 ID 列表 */
+  /** 当前用户已选课程的 ID 列表 */
   const [enrolledIds, setEnrolledIds] = useState<string[]>([]);
 
-  /** 从数据库加载所有课程（只要 name + description 即可） */
+  /** 控制 All Courses / My Courses 显示 */
+  const [showAll, setShowAll] = useState<boolean>(true);
+
+  /** 加载所有课程 */
   const fetchCourses = async () => {
     try {
       const cs = await client.findAllCourses();
@@ -43,14 +46,14 @@ export default function Dashboard() {
     }
   };
 
-  /** 从数据库加载“当前用户已经选了哪些课” */
+  /** 加载当前用户的 enroll 信息 */
   const fetchEnrolledCourses = async () => {
     if (!currentUser) {
       setEnrolledIds([]);
       return;
     }
     try {
-      const myCourses = await client.findMyCourses(); // GET /api/users/current/courses
+      const myCourses = await client.findMyCourses();
       const ids = myCourses.map((c: any) => c._id);
       setEnrolledIds(ids);
     } catch (e) {
@@ -58,17 +61,17 @@ export default function Dashboard() {
     }
   };
 
-  /** 首次挂载：加载课程列表 */
+  /** 初始化加载课程 */
   useEffect(() => {
     fetchCourses();
   }, []);
 
-  /** 当前用户变化时：刷新已选课程 */
+  /** 用户变化 → 更新 enroll */
   useEffect(() => {
     fetchEnrolledCourses();
   }, [currentUser]);
 
-  /** 新增课程（会在后端顺带给当前用户 enroll） */
+  /** Create */
   const onAddNewCourse = async () => {
     if (!currentUser) {
       alert("Please sign in first.");
@@ -77,7 +80,7 @@ export default function Dashboard() {
     try {
       const newCourse = await client.createCourse(course);
       dispatch(setCourses([...courses, newCourse]));
-      await fetchEnrolledCourses(); // 新建后刷新我的课程
+      await fetchEnrolledCourses();
       alert("Course added.");
     } catch (e) {
       console.error("createCourse failed", e);
@@ -85,7 +88,7 @@ export default function Dashboard() {
     }
   };
 
-  /** 删除课程（会在后端删掉所有 enrollments） */
+  /** Delete */
   const onDeleteCourse = async (courseId: string) => {
     try {
       await client.deleteCourse(courseId);
@@ -98,7 +101,7 @@ export default function Dashboard() {
     }
   };
 
-  /** 更新课程基本信息 */
+  /** Update */
   const onUpdateCourse = async () => {
     try {
       const updated = await client.updateCourse(course);
@@ -112,7 +115,7 @@ export default function Dashboard() {
     }
   };
 
-  /** ENROLL：调用后端 API + 刷新本地 enrolledIds */
+  /** Enroll */
   const onEnroll = async (courseId: string) => {
     if (!currentUser) {
       alert("Please sign in first.");
@@ -120,7 +123,7 @@ export default function Dashboard() {
     }
     try {
       await client.enrollIntoCourse(currentUser._id, courseId);
-      await fetchEnrolledCourses(); // 重新拉一次「我选了哪些课」
+      await fetchEnrolledCourses();
       alert("Enrolled!");
     } catch (e) {
       console.error("enrollIntoCourse failed", e);
@@ -128,7 +131,7 @@ export default function Dashboard() {
     }
   };
 
-  /** UNENROLL：调用后端 API + 刷新本地 enrolledIds */
+  /** Unenroll */
   const onUnenroll = async (courseId: string) => {
     if (!currentUser) {
       alert("Please sign in first.");
@@ -144,20 +147,44 @@ export default function Dashboard() {
     }
   };
 
-  /** 判断某门课当前用户是否已选：
-   * 只看 course._id 是否出现在 enrolledIds 里
-   */
+  /** 是否已选课程 */
   const isEnrolled = (courseId: string) => {
-    if (!currentUser) return false;
-    return enrolledIds.includes(courseId);
+    return currentUser && enrolledIds.includes(courseId);
   };
+
+  /** 根据 showAll 决定显示哪些课程 */
+  const displayedCourses = showAll
+    ? courses
+    : courses.filter((c: any) => enrolledIds.includes(c._id));
 
   return (
     <div className="p-4" id="wd-dashboard">
       <h1>Dashboard</h1>
       <hr />
 
-      {/* FORM - Add / Edit / Update */}
+      {/* ---------------------- */}
+      {/* All Courses / My Courses */}
+      {/* ---------------------- */}
+      <div className="d-flex justify-content-end mb-4">
+        <Button
+          variant={showAll ? "primary" : "secondary"}
+          className="me-2"
+          onClick={() => setShowAll(true)}
+        >
+          All Courses
+        </Button>
+
+        <Button
+          variant={!showAll ? "primary" : "secondary"}
+          onClick={() => setShowAll(false)}
+        >
+          My Courses
+        </Button>
+      </div>
+
+      {/* ---------------------- */}
+      {/* Manage Course Form */}
+      {/* ---------------------- */}
       <h5>
         Manage Course
         <button className="btn btn-primary float-end" onClick={onAddNewCourse}>
@@ -179,7 +206,7 @@ export default function Dashboard() {
       />
 
       <FormControl
-        className="mb-2"
+        className="mb-3"
         as="textarea"
         rows={3}
         value={course.description}
@@ -191,35 +218,36 @@ export default function Dashboard() {
 
       <hr />
 
-      {/* ALL COURSES DISPLAY */}
+      {/* ---------------------- */}
+      {/* Course Cards */}
+      {/* ---------------------- */}
       <Row xs={1} md={5} className="g-4">
-        {courses.map((course) => (
+        {displayedCourses.map((course: any) => (
           <Col key={course._id} style={{ width: "300px" }}>
-            <Card>
-              <Link
-                href={`/Courses/${course._id}/Home`}
-                className="text-decoration-none text-dark"
-              >
-                <Card.Img
-                  src={course.image || "/images/reactjs.jpg"}
-                  height={160}
-                />
-                <Card.Body>
-                  <Card.Title className="text-nowrap overflow-hidden">
-                    {course.title}
-                  </Card.Title>
-                  <Card.Text
-                    className="overflow-hidden"
-                    style={{ height: "100px" }}
-                  >
-                    {course.description}
-                  </Card.Text>
-                </Card.Body>
-              </Link>
+            <Card className="shadow-sm" style={{ width: "18rem" }}>
+              <Card.Img
+                src={course.image || "/images/reactjs.jpg"}
+                height={160}
+                style={{ objectFit: "cover" }}
+              />
+
+              <Card.Body>
+                <h5 className="card-title text-primary text-nowrap overflow-hidden">
+                  {course.title || course.name}
+                </h5>
+
+                <p
+                  className="text-muted overflow-hidden"
+                  style={{ height: "75px", fontSize: "0.85rem" }}
+                >
+                  {course.description}
+                </p>
+              </Card.Body>
 
               <div className="p-2 d-flex justify-content-between">
                 <Button
                   variant="primary"
+                  size="sm"
                   onClick={() =>
                     (window.location.href = `/Courses/${course._id}/Home`)
                   }
@@ -230,6 +258,7 @@ export default function Dashboard() {
                 {!isEnrolled(course._id) ? (
                   <Button
                     variant="success"
+                    size="sm"
                     onClick={() => onEnroll(course._id)}
                   >
                     Enroll
@@ -237,18 +266,24 @@ export default function Dashboard() {
                 ) : (
                   <Button
                     variant="dark"
+                    size="sm"
                     onClick={() => onUnenroll(course._id)}
                   >
                     Unenroll
                   </Button>
                 )}
 
-                <Button variant="secondary" onClick={() => setCourse(course)}>
+                <Button
+                  variant="warning"
+                  size="sm"
+                  onClick={() => setCourse(course)}
+                >
                   Edit
                 </Button>
 
                 <Button
                   variant="danger"
+                  size="sm"
                   onClick={() => onDeleteCourse(course._id)}
                 >
                   Delete
