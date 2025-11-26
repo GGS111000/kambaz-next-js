@@ -24,7 +24,7 @@ export default function CoursesIndexPage() {
         {courses.map((c: any) => (
           <li key={c._id} className="list-group-item d-flex justify-content-between align-items-center">
             <div>
-              <div className="fw-bold">{c.name}</div>
+              <div className="fw-bold">{c.title}</div>
               <div className="text-muted small">{c.description}</div>
             </div>
             <Link href={`/Courses/${c._id}/Modules`} className="btn btn-danger">

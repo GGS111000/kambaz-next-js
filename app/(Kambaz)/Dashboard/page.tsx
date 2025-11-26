@@ -24,7 +24,7 @@ export default function Dashboard() {
   /** 当前正在编辑/新建的课程 */
   const [course, setCourse] = useState<any>({
     _id: "0",
-    name: "New Course",
+    title: "New Course",
     number: "NEW001",
     description: "New Description",
     image: "/images/reactjs.jpg",
@@ -173,9 +173,9 @@ export default function Dashboard() {
 
       <FormControl
         className="mb-2"
-        value={course.name}
+        value={course.title}
         placeholder="Course Name"
-        onChange={(e) => setCourse({ ...course, name: e.target.value })}
+        onChange={(e) => setCourse({ ...course, title: e.target.value })}
       />
 
       <FormControl
@@ -206,7 +206,7 @@ export default function Dashboard() {
                 />
                 <Card.Body>
                   <Card.Title className="text-nowrap overflow-hidden">
-                    {course.name}
+                    {course.title}
                   </Card.Title>
                   <Card.Text
                     className="overflow-hidden"
