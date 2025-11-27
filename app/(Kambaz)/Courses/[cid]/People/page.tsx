@@ -4,31 +4,29 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import PeopleTable from "./Table";
-import * as client from "../../client";
+import * as client from "../../../Courses/client";
 
 export default function PeoplePage() {
   const { cid } = useParams();
+
+  // 强制把 cid 转成 string
+  const courseId = Array.isArray(cid) ? cid[0] : cid;
+
   const [users, setUsers] = useState<any[]>([]);
 
   const fetchUsers = async () => {
-    const list = await client.findUsersForCourse(cid as string);
+    if (!courseId) return;
+    const list = await client.findUsersForCourse(courseId);
     setUsers(list);
   };
 
   useEffect(() => {
-  const load = async () => {
-    if (cid) {
-      const list = await client.findUsersForCourse(cid as string);
-      setUsers(list);
-    }
-  };
-  load();
-}, [cid]);
-
+    fetchUsers();
+  }, [courseId]);
 
   return (
     <div>
-      <h3>People in Course {cid}</h3>
+      <h3>People in Course {courseId}</h3>
       <PeopleTable users={users} fetchUsers={fetchUsers} />
     </div>
   );
