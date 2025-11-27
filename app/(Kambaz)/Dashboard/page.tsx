@@ -104,7 +104,11 @@ export default function Dashboard() {
   /** Update */
   const onUpdateCourse = async () => {
     try {
-      const updated = await client.updateCourse(course);
+      const updated = await client.updateCourse({
+        ...course,
+        _id: course._id,   // <-- 防止 _id 被 undefined 覆盖
+      });
+
       dispatch(
         setCourses(courses.map((c) => (c._id === course._id ? updated : c)))
       );
@@ -114,6 +118,7 @@ export default function Dashboard() {
       alert("Failed to update course.");
     }
   };
+
 
   /** Enroll */
   const onEnroll = async (courseId: string) => {
