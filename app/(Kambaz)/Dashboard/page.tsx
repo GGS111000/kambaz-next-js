@@ -53,7 +53,7 @@ export default function Dashboard() {
       return;
     }
     try {
-      const myCourses = await client.findMyCourses();
+      const myCourses = await client.myEnrollments();
       const ids = myCourses.map((c: any) => c._id);
       setEnrolledIds(ids);
     } catch (e) {
@@ -127,7 +127,7 @@ export default function Dashboard() {
       return;
     }
     try {
-      await client.enrollIntoCourse(currentUser._id, courseId);
+      await client.enrollInCourse(courseId);
       await fetchEnrolledCourses();
       alert("Enrolled!");
     } catch (e) {
@@ -143,7 +143,7 @@ export default function Dashboard() {
       return;
     }
     try {
-      await client.unenrollFromCourse(currentUser._id, courseId);
+      await client.unenrollFromCourse(courseId);
       await fetchEnrolledCourses();
       alert("Unenrolled.");
     } catch (e) {

@@ -71,11 +71,12 @@ export const enrollIntoCourse = async (userId: string, courseId: string) => {
 };
 
 /** UNENROLL：取消注册课程 */
-export const unenrollFromCourse = async (userId: string, courseId: string) => {
-  const response = await axiosWithCredentials.delete(
-    `${USERS_API}/${userId}/courses/${courseId}`
+export const unenrollFromCourse = async (courseId: string) => {
+  const { data } = await axiosWithCredentials.post(
+    `${COURSES_API}/${courseId}/unenroll`,
+    {}
   );
-  return response.data;
+  return data;
 };
 
 export const findUsersForCourse = async (courseId: string) => {
@@ -84,7 +85,6 @@ export const findUsersForCourse = async (courseId: string) => {
   );
   return data;
 };
-
 
 
 /* ---------- Modules ---------- */
@@ -141,7 +141,7 @@ export const myEnrollments = async () => {
   const { data } = await axiosWithCredentials.get(
     `${ENROLLMENTS_API}/current`
   );
-  return data;
+  return data;         // 这里返回的是“课程数组”
 };
 
 /* ---------- Assignments ---------- */

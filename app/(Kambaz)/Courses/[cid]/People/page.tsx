@@ -8,8 +8,6 @@ import * as client from "../../../Courses/client";
 
 export default function PeoplePage() {
   const { cid } = useParams();
-
-  // 强制把 cid 转成 string
   const courseId = Array.isArray(cid) ? cid[0] : cid;
 
   const [users, setUsers] = useState<any[]>([]);
