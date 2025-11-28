@@ -1,16 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { ReactNode } from "react";
+
+import type { ReactNode, ComponentType } from "react";
 import { Provider } from "react-redux";
-import store from "./store";
+import { store } from "./store";
 import KambazNavigation from "./Navigation";
 
-export default function KambazLayout({ children }: { children: ReactNode }) {
+const ReduxProvider = Provider as ComponentType<any>;
+
+export default function KambazLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
-    <Provider store={store}>
+    <ReduxProvider store={store}>
       <div className="d-flex">
-        <KambazNavigation />             {/* 左1黑栏 */}
+        <KambazNavigation />
         <div className="flex-grow-1 ms-4">{children}</div>
       </div>
-    </Provider>
+    </ReduxProvider>
   );
 }
