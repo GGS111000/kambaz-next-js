@@ -71,7 +71,7 @@ export const deleteUser = async (id: string) => {
   return response.data;
 };
 
-// 🔍 Get users by role
+// 🔍 Get users by role 
 export const findUsersByRole = async (role: string) => {
   const response = await axios.get(`${USERS_API}?role=${role}`);
   return response.data;
